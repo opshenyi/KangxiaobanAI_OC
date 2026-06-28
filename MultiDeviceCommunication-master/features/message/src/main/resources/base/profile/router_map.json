@@ -1,0 +1,9 @@
+{
+  "routerMap": [
+    {
+      "name": "MessageDetailView",
+      "pageSourceFile": "src/main/ets/view/MessageDetailView.ets",
+      "buildFunction": "MessageDetailBuilder"
+    }
+  ]
+}
