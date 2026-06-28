@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "TvAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "TvAbility_label",
+      "value": "label"
+    }
+  ]
+}
