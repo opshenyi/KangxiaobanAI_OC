@@ -1,0 +1,54 @@
+{
+  "apiType": "stageMode",
+  "buildOption": {
+    "arkOptions": {
+      "runtimeOnly": {
+        "packages": [
+          "@ohos/commonbusiness",
+          "@ohos/common",
+        ]
+      }
+    },
+  },
+  "buildOptionSet": [
+    {
+      "name": "release",
+      "arkOptions": {
+        "obfuscation": {
+          "ruleOptions": {
+            "enable": true,
+            "files": [
+              "./obfuscation-rules.txt"
+            ]
+          }
+        }
+      }
+    },
+  ],
+  "targets": [
+    {
+      "name": "dev",
+    },
+    {
+      "name": "uat",
+    },
+    {
+      "name": "uat_mirror",
+    },
+    {
+      "name": "icsl",
+    },
+    {
+      "name": "beta",
+    },
+    {
+      "name": "prod",
+    },
+    {
+      "name": "default"
+    },
+    {
+      "name": "ohosTest",
+    }
+  ]
+}
