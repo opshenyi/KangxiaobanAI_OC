@@ -10,8 +10,7 @@ import {
   HdsTabsController,
   ScrollEffectType
 } from '@kit.UIDesignKit';
-import { BreakpointModel } from '@kit.CommonUI';
-import { getWindowInfoState } from '../../../../common/src/main/ets/model/BreakpointModel';
+import { getWindowInfoState } from 'common';
 
 @Entry
 @ComponentV2
