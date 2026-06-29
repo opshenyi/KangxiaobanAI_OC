@@ -15,6 +15,10 @@
 import { BreakpointTypes } from './BreakpointType';
 import { WindowInfo } from './WindowInfo';
 
+export function getWindowInfoState(): WindowInfo {
+  return BreakpointModel.getInstance().windowInfo;
+}
+
 @ObservedV2
 export class BreakpointModel {
   private static singleton_: BreakpointModel;

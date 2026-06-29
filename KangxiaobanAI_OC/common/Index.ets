@@ -8,6 +8,7 @@ export { WebUtil, WebLoading } from './src/main/ets/utils/WebUtil';
 export { ProcessUtil } from './src/main/ets/utils/ProcessUtil';
 export { ResourceUtil } from './src/main/ets/utils/ResourceUtil';
 export { NetworkUtil } from './src/main/ets/utils/NetworkUtil';
+export { BreakpointModel, getWindowInfoState } from './src/main/ets/model/BreakpointModel';
 
 // Design Tokens
 export { SizeToken } from './src/main/ets/designtoken/SizeToken';
@@ -17,7 +18,6 @@ export { SpaceToken } from './src/main/ets/designtoken/SpaceToken';
 export { ColorToken } from './src/main/ets/designtoken/ColorToken';
 
 // Models
-export { BreakpointModel } from './src/main/ets/model/BreakpointModel';
 export { WindowInfo } from './src/main/ets/model/WindowInfo';
 export { ComponentItem } from './src/main/ets/model/ComponentItem';
 export { ComponentGroup } from './src/main/ets/model/ComponentGroup';

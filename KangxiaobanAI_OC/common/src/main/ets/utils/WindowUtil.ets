@@ -19,8 +19,14 @@ import Logger from './Logger';
 import { BreakpointModel } from '../model/BreakpointModel';
 import { ImmersiveType, StorageKey } from '../constants/CommonEnums';
 import { SizeToken } from '../designtoken/SizeToken';
+import { WindowInfo } from '../model/WindowInfo';
 
 const TAG = 'WindowUtil';
+
+interface AvoidAreaChangeOption {
+  type: window.AvoidAreaType;
+  area: window.AvoidArea;
+}
 
 export class WindowUtil {
   private static winSingleton: WindowUtil;
@@ -197,7 +203,22 @@ export class WindowUtil {
   registerBreakpoint(windowClass: window.Window) {
     this.updateBreakpoint();
     windowClass.on('windowSizeChange', this.onWindowSizeChange);
+    windowClass.on('avoidAreaChange', this.onAvoidAreaChange);
   }
+
+  private onAvoidAreaChange = (avoidAreaOption: AvoidAreaChangeOption): void => {
+    if (avoidAreaOption.type === window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR) {
+      const nav = avoidAreaOption.area?.bottomRect;
+      if (nav && nav.height > 0) {
+        this.breakpointModel.windowInfo.navigationBarBottomVp = this.uiContext ? this.uiContext.px2vp(nav.height) : 0;
+      } else {
+        this.breakpointModel.windowInfo.navigationBarBottomVp = 0;
+      }
+    }
+    if (avoidAreaOption.type === window.AvoidAreaType.TYPE_SYSTEM) {
+      this.breakpointModel.windowInfo.statusBarHeight = avoidAreaOption.area?.topRect.height ?? 0;
+    }
+  };
 
   updateBreakpoint() {
     try {
@@ -216,6 +237,15 @@ export class WindowUtil {
         this.mainWindowClass?.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR);
       this.breakpointModel.windowInfo.statusBarHeight = systemAvoidArea?.topRect.height ?? 0;
       this.breakpointModel.windowInfo.navAvoidAreaHeight = navigationIndicatorAvoidArea?.bottomRect.height ?? 0;
+      // Calculate navigationBarBottomVp
+      if (this.uiContext) {
+        const nav = navigationIndicatorAvoidArea?.bottomRect;
+        if (nav && nav.height > 0) {
+          this.breakpointModel.windowInfo.navigationBarBottomVp = this.uiContext.px2vp(nav.height);
+        } else {
+          this.breakpointModel.windowInfo.navigationBarBottomVp = 0;
+        }
+      }
     } catch (error) {
       Logger.error(TAG, `Failed to get the avoid area, error: ${JSON.stringify(error)}`);
     }
@@ -236,6 +266,7 @@ export class WindowUtil {
 
   unregisterBreakpoint() {
     this.mainWindowClass?.off('windowSizeChange', this.onWindowSizeChange);
+    this.mainWindowClass?.off('avoidAreaChange', this.onAvoidAreaChange);
   }
 
   setImmersiveType(type: ImmersiveType) {

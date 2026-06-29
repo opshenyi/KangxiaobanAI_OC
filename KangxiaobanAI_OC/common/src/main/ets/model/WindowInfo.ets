@@ -30,6 +30,8 @@ export class WindowInfo {
   @Trace public statusBarHeight: number = 0;
   // The height of the navigation bar area.(unit: px)
   @Trace public navAvoidAreaHeight: number = 0;
+  // Navigation bar bottom height in vp for responsive layout.(unit: vp)
+  @Trace public navigationBarBottomVp: number = 0;
   // used to obtain the height of the window's title bar
   @Trace public decorHeight: number = 0;
 }
