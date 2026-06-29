@@ -90,7 +90,6 @@ struct Index {
       Column() {
         Search({ placeholder: '搜索内容' })
           .width('100%')
-          .margin({ bottom: $r('sys.float.padding_level4'), top: $r('sys.float.padding_level4') })
           .borderRadius($r('sys.float.corner_radius_level8'))
           .height(40)
 
@@ -112,8 +111,7 @@ struct Index {
         .vertical(false)
         .barPosition(BarPosition.End)
         .barFloatingStyle({
-          barBottomMargin: getWindowInfoState().navigationBarBottomVp > 0 ? getWindowInfoState().navigationBarBottomVp :
-            $r('sys.float.padding_level8'),
+          barBottomMargin: 0,
           systemMaterialEffect: {
             materialType: hdsMaterial.MaterialType.IMMERSIVE,
             materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
@@ -137,7 +135,9 @@ struct Index {
       .height('100%')
       .padding({
         left: $r('sys.float.padding_level4'),
-        right: $r('sys.float.padding_level4')
+        right: $r('sys.float.padding_level4'),
+        top: $r('sys.float.padding_level4'),
+        bottom: 0
       })
     }
     .titleBar({
@@ -159,6 +159,6 @@ struct Index {
     })
     .titleMode(HdsNavigationTitleMode.MINI)
     .hideBackButton(true)
-    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
   }
 }
