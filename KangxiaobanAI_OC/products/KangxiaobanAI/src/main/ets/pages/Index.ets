@@ -13,6 +13,8 @@ import {
 } from '@kit.UIDesignKit';
 import { getWindowInfoState } from 'common';
 
+const TITLE_BAR_HEIGHT_MINI = 56;
+
 @Entry
 @ComponentV2
 struct Index {
@@ -86,10 +88,17 @@ struct Index {
   }
 
   build() {
+    let windowInfo = getWindowInfoState();
+
     HdsNavigation(this.navPathStack) {
       Column() {
+        Blank()
+          .width('100%')
+          .height(TITLE_BAR_HEIGHT_MINI + windowInfo.statusBarTopVp)
+
         Search({ placeholder: '搜索内容' })
           .width('100%')
+          .margin({ bottom: $r('sys.float.padding_level4') })
           .borderRadius($r('sys.float.corner_radius_level8'))
           .height(40)
 
@@ -135,9 +144,7 @@ struct Index {
       .height('100%')
       .padding({
         left: $r('sys.float.padding_level4'),
-        right: $r('sys.float.padding_level4'),
-        top: $r('sys.float.padding_level4'),
-        bottom: 0
+        right: $r('sys.float.padding_level4')
       })
     }
     .titleBar({
