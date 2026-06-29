@@ -495,6 +495,134 @@
     {
       "name": "page_mine_section_2_item_2_tag",
       "value": "Standard"
+    },
+    {
+      "name": "common_close",
+      "value": "Close"
+    },
+    {
+      "name": "check_in_page_title",
+      "value": "Check-In Flow"
+    },
+    {
+      "name": "check_in_page_subtitle",
+      "value": "Complete profile review, bed assignment and handoff notes in order"
+    },
+    {
+      "name": "check_in_current_stage",
+      "value": "Profile Review"
+    },
+    {
+      "name": "check_in_section_steps_title",
+      "value": "Steps"
+    },
+    {
+      "name": "check_in_section_steps_desc",
+      "value": "Finish each step in the caregiving intake order"
+    },
+    {
+      "name": "check_in_step_1_title",
+      "value": "Verify basic profile"
+    },
+    {
+      "name": "check_in_step_1_subtitle",
+      "value": "Confirm identity, emergency contacts, history and allergies"
+    },
+    {
+      "name": "check_in_step_1_tag",
+      "value": "Current"
+    },
+    {
+      "name": "check_in_step_2_title",
+      "value": "Assign room and bed"
+    },
+    {
+      "name": "check_in_step_2_subtitle",
+      "value": "Match care level, gender and companion requirements"
+    },
+    {
+      "name": "check_in_step_2_tag",
+      "value": "Pending"
+    },
+    {
+      "name": "check_in_step_3_title",
+      "value": "Initial health review"
+    },
+    {
+      "name": "check_in_step_3_subtitle",
+      "value": "Record blood pressure, glucose, mobility and risk level"
+    },
+    {
+      "name": "check_in_step_3_tag",
+      "value": "Next"
+    },
+    {
+      "name": "check_in_step_4_title",
+      "value": "Sync care plan"
+    },
+    {
+      "name": "check_in_step_4_subtitle",
+      "value": "Create diet, medication, rehab and schedule reminders"
+    },
+    {
+      "name": "check_in_step_4_tag",
+      "value": "Review"
+    },
+    {
+      "name": "check_in_step_5_title",
+      "value": "Finish handoff note"
+    },
+    {
+      "name": "check_in_step_5_subtitle",
+      "value": "Share key watch points with the nursing station and next caregiver"
+    },
+    {
+      "name": "check_in_step_5_tag",
+      "value": "Final"
+    },
+    {
+      "name": "check_in_section_ready_title",
+      "value": "Preparation"
+    },
+    {
+      "name": "check_in_section_ready_desc",
+      "value": "Make sure these items are ready before intake is completed"
+    },
+    {
+      "name": "check_in_ready_1_title",
+      "value": "Profile pack and ID card"
+    },
+    {
+      "name": "check_in_ready_1_subtitle",
+      "value": "Includes intake form, orders, family authorization and ID"
+    },
+    {
+      "name": "check_in_ready_1_tag",
+      "value": "Required"
+    },
+    {
+      "name": "check_in_ready_2_title",
+      "value": "Bedside environment"
+    },
+    {
+      "name": "check_in_ready_2_subtitle",
+      "value": "Check bedding, call bell, anti-slip gear and safety labels"
+    },
+    {
+      "name": "check_in_ready_2_tag",
+      "value": "Check"
+    },
+    {
+      "name": "check_in_ready_3_title",
+      "value": "First-day briefing"
+    },
+    {
+      "name": "check_in_ready_3_subtitle",
+      "value": "Explain schedule, visits and care contacts to resident and family"
+    },
+    {
+      "name": "check_in_ready_3_tag",
+      "value": "Notify"
     }
   ]
 }

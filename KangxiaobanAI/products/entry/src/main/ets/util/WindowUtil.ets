@@ -31,10 +31,26 @@ export class WindowUtil {
       const uiContext: UIContext = WindowUtil.windowClass.getUIContext();
       WindowUtil.uiContext = uiContext;
       AppStorageV2.connect(UIContext, StorageKey.UI_CONTEXT, () => uiContext);
+      WindowUtil.setImmersiveMode(false);
       WindowUtil.registerBreakpoint(WindowUtil.windowClass);
     } catch (err) {
       Logger.error(TAG, `WindowUtil initialize failed. Cause: ${err.code} ${err.message}`);
     }
+  }
+
+  public static setImmersiveMode(enable: boolean): void {
+    if (!WindowUtil.windowClass) {
+      return;
+    }
+    WindowUtil.windowClass.setWindowLayoutFullScreen(enable).catch((err: BusinessError) => {
+      Logger.error(TAG, `setWindowLayoutFullScreen failed. code: ${err.code}, message: ${err.message}`);
+    });
+    WindowUtil.windowClass.setWindowSystemBarProperties({
+      statusBarColor: '#00000000',
+      navigationBarColor: '#00000000'
+    }).catch((err: BusinessError) => {
+      Logger.error(TAG, `setWindowSystemBarProperties failed. code: ${err.code}, message: ${err.message}`);
+    });
   }
 
   private static getDeviceSize(): void {

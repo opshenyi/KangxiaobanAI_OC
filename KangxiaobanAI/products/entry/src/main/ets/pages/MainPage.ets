@@ -23,6 +23,7 @@ import {
   HdsTabsController,
   ScrollEffectType,
 } from '@kit.UIDesignKit';
+import { CheckInFlowPage } from '../component/CheckInFlowPage';
 import { TabPageView } from '../component/TabPageView';
 import { StorageKey } from '../common/CommonConstants';
 import { GlobalInfoModel } from '../model/GlobalInfoModel';
@@ -31,10 +32,12 @@ import { TAB_PAGE_CONFIGS, TabPageConfig } from '../model/TabPageModel';
 import Logger from '../util/Logger';
 
 const TAG: string = '[MainPage]';
+const CHECK_IN_ROUTE_NAME: string = 'CheckInRegister';
 
 @Entry
 @ComponentV2
 struct MainPage {
+  @Provider('mainPageStack') pathStack: NavPathStack = new NavPathStack();
   @Local globalInfoModel: GlobalInfoModel =
     AppStorageV2.connect(GlobalInfoModel, StorageKey.GLOBAL_INFO) ?? new GlobalInfoModel();
   private controller: HdsTabsController = new HdsTabsController();
@@ -47,10 +50,18 @@ struct MainPage {
     return this.pageConfigs[this.currentTabIndex]?.title ?? $r('app.string.tab_home');
   }
 
+  private openCheckInFlow(): void {
+    this.pathStack.pushPath({ name: CHECK_IN_ROUTE_NAME });
+  }
+
   @Builder
   miniBarBuilder() {
     Row() {
-      Column() {
+      Stack({ alignContent: Alignment.Center }) {
+        Circle()
+          .width(56)
+          .height(56)
+          .fill('#00000000')
         SymbolGlyph($r('sys.symbol.plus'))
           .fontSize($r('sys.float.Title_L'))
           .fontColor([$r('sys.color.icon_primary')])
@@ -58,8 +69,6 @@ struct MainPage {
       .padding(this.isMiniBar ? $r('sys.float.padding_level1') : $r('sys.float.padding_level3'))
       .width(56)
       .aspectRatio(1)
-      .alignItems(HorizontalAlign.Center)
-      .justifyContent(FlexAlign.Center)
 
       Column({ space: 6 }) {
         Text($r('app.string.mini_bar_title'))
@@ -78,6 +87,7 @@ struct MainPage {
       .padding({ left: $r('sys.float.padding_level1') })
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
+      .transition(TransitionEffect.OPACITY)
 
       Column({ space: 2 }) {
         Text($r('app.string.mini_bar_capacity_label'))
@@ -95,15 +105,28 @@ struct MainPage {
       }
       .alignItems(HorizontalAlign.End)
       .justifyContent(FlexAlign.Center)
+      .transition(TransitionEffect.OPACITY)
       .padding({
         left: $r('sys.float.padding_level4'),
         right: $r('sys.float.padding_level8')
       })
     }
+    .width('100%')
+    .transition(TransitionEffect.OPACITY)
+    .onClick(() => {
+      this.openCheckInFlow();
+    })
+  }
+
+  @Builder
+  private destinationBuilder(name: string, param?: ESObject) {
+    if (name === CHECK_IN_ROUTE_NAME) {
+      CheckInFlowPage()
+    }
   }
 
   build() {
-    HdsNavigation() {
+    HdsNavigation(this.pathStack) {
       HdsTabs({ controller: this.controller }) {
         TabContent() {
           TabPageView({
@@ -170,6 +193,7 @@ struct MainPage {
       })
     }
     .mode(NavigationMode.Stack)
+    .navDestination(this.destinationBuilder)
     .titleBar({
       content: {
         title: {
@@ -191,5 +215,7 @@ struct MainPage {
     .hideBackButton(true)
     .titleMode(HdsNavigationTitleMode.MINI)
     .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
+    .width('100%')
+    .height('100%')
   }
 }
