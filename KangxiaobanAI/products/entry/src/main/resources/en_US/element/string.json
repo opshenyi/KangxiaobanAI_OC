@@ -22,15 +22,31 @@
     },
     {
       "name": "tab_music",
-      "value": "Music"
+      "value": "Elder"
     },
     {
       "name": "tab_cafe",
-      "value": "Cafe"
+      "value": "Task"
     },
     {
       "name": "tab_mine",
       "value": "Mine"
+    },
+    {
+      "name": "mini_bar_title",
+      "value": "Check In"
+    },
+    {
+      "name": "mini_bar_operator",
+      "value": "Operator: XXX"
+    },
+    {
+      "name": "mini_bar_capacity_label",
+      "value": "Beds Left"
+    },
+    {
+      "name": "mini_bar_capacity_value",
+      "value": "XX"
     }
   ]
 }

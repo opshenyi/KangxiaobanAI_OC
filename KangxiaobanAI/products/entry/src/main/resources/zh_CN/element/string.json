@@ -2,11 +2,11 @@
   "string": [
     {
       "name": "module_desc",
-      "value": "Kanxiaoban 模块"
+      "value": "Kanxiaoban \u6a21\u5757"
     },
     {
       "name": "KanxiaobanAbility_desc",
-      "value": "Kanxiaoban AI 主能力"
+      "value": "Kanxiaoban AI \u4e3b\u80fd\u529b"
     },
     {
       "name": "KanxiaobanAbility_label",
@@ -14,23 +14,39 @@
     },
     {
       "name": "home_title",
-      "value": "自适应悬浮导航"
+      "value": "\u81ea\u9002\u5e94\u60ac\u6d6e\u5bfc\u822a"
     },
     {
       "name": "tab_home",
-      "value": "首页"
+      "value": "\u9996\u9875"
     },
     {
       "name": "tab_music",
-      "value": "音乐"
+      "value": "\u957f\u8005"
     },
     {
       "name": "tab_cafe",
-      "value": "Cafe"
+      "value": "\u4efb\u52a1"
     },
     {
       "name": "tab_mine",
-      "value": "我的"
+      "value": "\u6211\u7684"
+    },
+    {
+      "name": "mini_bar_title",
+      "value": "\u529e\u7406\u5165\u4f4f"
+    },
+    {
+      "name": "mini_bar_operator",
+      "value": "\u64cd\u4f5c\u4eba\uff1aXXX"
+    },
+    {
+      "name": "mini_bar_capacity_label",
+      "value": "\u5269\u4f59\u5e8a\u4f4d"
+    },
+    {
+      "name": "mini_bar_capacity_value",
+      "value": "XX"
     }
   ]
 }

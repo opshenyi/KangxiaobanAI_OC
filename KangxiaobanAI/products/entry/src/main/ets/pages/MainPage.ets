@@ -44,24 +44,24 @@ struct MainPage {
   miniBarBuilder() {
     Row() {
       Column() {
-        Image($r('app.media.banner_HMOS'))
-          .width('100%')
-          .height('100%')
-          .borderRadius('50%')
+        SymbolGlyph($r('sys.symbol.plus'))
+          .fontSize($r('sys.float.Title_L'))
+          .fontColor([$r('sys.color.icon_primary')])
       }
-      .padding(this.isMiniBar ? 1 : $r('sys.float.padding_level3'))
+      .padding(this.isMiniBar ? $r('sys.float.padding_level1') : $r('sys.float.padding_level3'))
       .width(56)
       .aspectRatio(1)
+      .alignItems(HorizontalAlign.Center)
       .justifyContent(FlexAlign.Center)
 
       Column({ space: 6 }) {
-        Text('Espresso')
+        Text($r('app.string.mini_bar_title'))
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .maxLines(1)
           .fontWeight(FontWeight.Bold)
           .fontColor($r('sys.color.font_primary'))
           .fontSize($r('sys.float.Body_S'))
-        Text('Sabrina Carpenter')
+        Text($r('app.string.mini_bar_operator'))
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .maxLines(1)
           .fontWeight(FontWeight.Regular)
@@ -72,14 +72,22 @@ struct MainPage {
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
 
-      Row({ space: 16 }) {
-        SymbolGlyph($r('sys.symbol.play_round_triangle_fill'))
-          .fontSize($r('sys.float.Title_M'))
-        SymbolGlyph($r('sys.symbol.forward_end_fill'))
-          .fontSize($r('sys.float.Title_M'))
-        SymbolGlyph($r('sys.symbol.music_note_list'))
-          .fontSize($r('sys.float.Title_M'))
+      Column({ space: 2 }) {
+        Text($r('app.string.mini_bar_capacity_label'))
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .maxLines(1)
+          .fontWeight(FontWeight.Regular)
+          .fontColor($r('sys.color.font_secondary'))
+          .fontSize($r('sys.float.Caption_M'))
+        Text($r('app.string.mini_bar_capacity_value'))
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .maxLines(1)
+          .fontWeight(FontWeight.Bold)
+          .fontColor($r('sys.color.font_primary'))
+          .fontSize($r('sys.float.Body_S'))
       }
+      .alignItems(HorizontalAlign.End)
+      .justifyContent(FlexAlign.Center)
       .padding({
         left: $r('sys.float.padding_level4'),
         right: $r('sys.float.padding_level8')

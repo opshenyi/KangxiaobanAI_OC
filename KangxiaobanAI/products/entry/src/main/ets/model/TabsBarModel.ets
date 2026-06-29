@@ -61,16 +61,16 @@ const PAGE_BAR_MAP: Map<PageKeyEnum, BarItem[]> = new Map([
     {
       label: $r('app.string.tab_music'),
       normalColor: $r('sys.color.icon_primary'),
-      normalSymbolResource: $r('sys.symbol.music_square_stack_fill'),
+      normalSymbolResource: $r('sys.symbol.person_fill'),
       selectedColor: '#FF1949',
-      selectedSymbolResource: $r('sys.symbol.music_square_stack_fill'),
+      selectedSymbolResource: $r('sys.symbol.person_fill'),
     },
     {
       label: $r('app.string.tab_cafe'),
       normalColor: $r('sys.color.icon_primary'),
-      normalSymbolResource: $r('sys.symbol.meta_service'),
+      normalSymbolResource: $r('sys.symbol.square_and_pencil_fill'),
       selectedColor: '#FF1949',
-      selectedSymbolResource: $r('sys.symbol.meta_service'),
+      selectedSymbolResource: $r('sys.symbol.square_and_pencil_fill'),
     },
     {
       label: $r('app.string.tab_mine'),

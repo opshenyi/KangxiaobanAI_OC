@@ -18,19 +18,35 @@
     },
     {
       "name": "tab_home",
-      "value": "Home"
+      "value": "\u9996\u9875"
     },
     {
       "name": "tab_music",
-      "value": "Music"
+      "value": "\u957f\u8005"
     },
     {
       "name": "tab_cafe",
-      "value": "Cafe"
+      "value": "\u4efb\u52a1"
     },
     {
       "name": "tab_mine",
-      "value": "Mine"
+      "value": "\u6211\u7684"
+    },
+    {
+      "name": "mini_bar_title",
+      "value": "\u529e\u7406\u5165\u4f4f"
+    },
+    {
+      "name": "mini_bar_operator",
+      "value": "\u64cd\u4f5c\u4eba\uff1aXXX"
+    },
+    {
+      "name": "mini_bar_capacity_label",
+      "value": "\u5269\u4f59\u5e8a\u4f4d"
+    },
+    {
+      "name": "mini_bar_capacity_value",
+      "value": "XX"
     }
   ]
 }
