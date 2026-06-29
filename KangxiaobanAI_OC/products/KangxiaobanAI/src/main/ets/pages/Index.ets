@@ -10,6 +10,8 @@ import {
   HdsTabsController,
   ScrollEffectType
 } from '@kit.UIDesignKit';
+import { BreakpointModel } from '@kit.CommonUI';
+import { getWindowInfoState } from '../../../../common/src/main/ets/model/BreakpointModel';
 
 @Entry
 @ComponentV2
@@ -101,7 +103,8 @@ struct Index {
       .vertical(false)
       .barPosition(BarPosition.End)
       .barFloatingStyle({
-        barBottomMargin: $r('sys.float.padding_level8'),
+        barBottomMargin: getWindowInfoState().navigationBarBottomVp > 0 ? getWindowInfoState().navigationBarBottomVp :
+          $r('sys.float.padding_level8'),
         systemMaterialEffect: {
           materialType: hdsMaterial.MaterialType.IMMERSIVE,
           materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
