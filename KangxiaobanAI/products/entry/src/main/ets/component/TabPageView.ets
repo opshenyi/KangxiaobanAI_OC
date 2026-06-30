@@ -330,7 +330,6 @@ export struct TabPageView {
   private healthCardData(): HealthListCardData {
     return {
       title: '老人健康状态',
-      subTitle: '长者健康',
       rows: this.healthRows().map((item: HealthRowData): HealthListCardRow => {
         return {
           id: item.id,
@@ -514,8 +513,8 @@ export struct TabPageView {
   private sectionHeader(title: string, count?: number) {
     Row() {
       Text(title)
-        .fontSize($r('sys.float.Body_M'))
-        .fontWeight(FontWeight.Medium)
+        .fontSize($r('sys.float.Title_M'))
+        .fontWeight(FontWeight.Bold)
         .fontColor($r('sys.color.font_primary'))
       Blank()
       if (count !== undefined) {
@@ -525,7 +524,7 @@ export struct TabPageView {
       }
     }
     .width('100%')
-    .height(40)
+    .padding({ bottom: $r('sys.float.padding_level4') })
   }
 
   @Builder
@@ -606,15 +605,8 @@ export struct TabPageView {
 
 
   @Builder
-  private deviceRow(item: DeviceRowData, isLast: boolean) {
+  private deviceRow(item: DeviceRowData) {
     HdsListItemCard({
-      prefixItem: new PrefixIcon({
-        iconSize: IconSize.SYSTEM_ICON,
-        iconValue: {
-          symbol: new SymbolGlyphModifier($r('sys.symbol.dot_grid_2x2'))
-            .fontColor([this.statusColor(item.level)])
-        }
-      }),
       textItem: {
         primaryText: {
           text: item.name
@@ -627,29 +619,16 @@ export struct TabPageView {
         text: `${item.status} · ${item.lastUpdate}`
       }),
       cardBorderRadius: 0,
-      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardBackgroundColor: $r('sys.color.ohos_id_color_background_transparent'),
       cardHeight: 52,
       cardPrefixMargin: 0,
       cardSuffixMargin: 0
     })
-      .border({
-        width: {
-          bottom: isLast ? 0 : 0.5
-        },
-        color: $r('sys.color.comp_divider')
-      })
   }
 
   @Builder
-  private eventTimelineRow(item: EventRowData, isLast: boolean) {
+  private eventTimelineRow(item: EventRowData) {
     HdsListItemCard({
-      prefixItem: new PrefixIcon({
-        iconSize: IconSize.SYSTEM_ICON,
-        iconValue: {
-          symbol: new SymbolGlyphModifier(this.eventTypeIcon(item.type))
-            .fontColor([this.eventTypeColor(item.type)])
-        }
-      }),
       textItem: {
         primaryText: {
           text: item.title
@@ -662,17 +641,11 @@ export struct TabPageView {
         text: item.time
       }),
       cardBorderRadius: 0,
-      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardBackgroundColor: $r('sys.color.ohos_id_color_background_transparent'),
       cardHeight: 64,
       cardPrefixMargin: 0,
       cardSuffixMargin: 0
     })
-      .border({
-        width: {
-          bottom: isLast ? 0 : 0.5
-        },
-        color: $r('sys.color.comp_divider')
-      })
   }
 
   // ---------------- resident builders ----------------
@@ -1260,14 +1233,27 @@ export struct TabPageView {
       ListItem() {
         Column({ space: 0 }) {
           this.sectionHeader('设备状态', this.deviceRows().length)
-          Column({ space: 0 }) {
+          List({ space: 0 }) {
             Repeat(this.deviceRows())
               .each((repeatItem: RepeatItem<DeviceRowData>) => {
-                this.deviceRow(repeatItem.item, repeatItem.index === this.deviceRows().length - 1)
+                ListItem() {
+                  this.deviceRow(repeatItem.item)
+                }
               })
+              .key((row: DeviceRowData) => row.id)
           }
+          .divider({
+            strokeWidth: '1px',
+            color: $r('sys.color.comp_background_tertiary'),
+            startMargin: 0,
+            endMargin: 0
+          })
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.None)
+          .width('100%')
+          .height(this.deviceRows().length * 52)
         }
-        .padding({ left: 16, right: 16 })
+        .padding({ left: 24, right: 24, top: 16, bottom: 8 })
         .backgroundColor($r('sys.color.comp_background_primary'))
         .borderRadius(16)
         .clip(true)
@@ -1280,14 +1266,27 @@ export struct TabPageView {
       ListItem() {
         Column({ space: 0 }) {
           this.sectionHeader('今日事件流', this.eventRows().length)
-          Column({ space: 0 }) {
+          List({ space: 0 }) {
             Repeat(this.eventRows())
               .each((repeatItem: RepeatItem<EventRowData>) => {
-                this.eventTimelineRow(repeatItem.item, repeatItem.index === this.eventRows().length - 1)
+                ListItem() {
+                  this.eventTimelineRow(repeatItem.item)
+                }
               })
+              .key((row: EventRowData) => `${row.time}-${row.title}`)
           }
+          .divider({
+            strokeWidth: '1px',
+            color: $r('sys.color.comp_background_tertiary'),
+            startMargin: 0,
+            endMargin: 0
+          })
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.None)
+          .width('100%')
+          .height(this.eventRows().length * 64)
         }
-        .padding({ left: 16, right: 16, bottom: 16 })
+        .padding({ left: 24, right: 24, top: 16, bottom: 8 })
         .backgroundColor($r('sys.color.comp_background_primary'))
         .borderRadius(16)
         .clip(true)

@@ -39,6 +39,16 @@ export struct HealthListCard {
   @Param @Require widthBreakpoint: WidthBreakpoint;
   @Event onItemClick: (id: string) => void = () => {};
 
+  @Styles
+  itemNormalStyle() {
+    .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
+  }
+
+  @Styles
+  itemPressedStyle() {
+    .backgroundColor($r('sys.color.ohos_id_color_background_transparent'))
+  }
+
   private bottomPadding(): number {
     return new BreakpointType<number>({
       sm: 4,
@@ -56,7 +66,6 @@ export struct HealthListCard {
             .fontColor($r('sys.color.font_secondary'))
             .fontWeight(FontWeight.Regular)
             .margin({
-              left: $r('sys.float.padding_level8'),
               bottom: $r('sys.float.padding_level2')
             })
             .maxLines(1)
@@ -69,7 +78,6 @@ export struct HealthListCard {
           .fontColor($r('sys.color.font_primary'))
           .fontWeight(FontWeight.Bold)
           .margin({
-            left: $r('sys.float.padding_level8'),
             bottom: $r('sys.float.padding_level4')
           })
           .maxLines(1)
@@ -77,7 +85,6 @@ export struct HealthListCard {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .alignItems(HorizontalAlign.Start)
-      .height(56)
       .width('100%')
 
       List({ space: 0 }) {
@@ -100,19 +107,24 @@ export struct HealthListCard {
                 cardHeight: 68,
                 cardPrefixMargin: $r('sys.float.padding_level0'),
                 cardSuffixMargin: $r('sys.float.padding_level2'),
-                onClick: () => {
-                  this.onItemClick(repeatItem.item.id);
-                }
+                hoverBorderRadius: 0
               })
             }
+            .onClick(() => {
+              this.onItemClick(repeatItem.item.id);
+            })
+            .stateStyles({
+              pressed: this.itemPressedStyle,
+              normal: this.itemNormalStyle
+            })
           })
           .key((row: HealthListCardRow) => row.id)
       }
       .divider({
         strokeWidth: '1px',
         color: $r('sys.color.comp_background_tertiary'),
-        startMargin: 16,
-        endMargin: 16
+        startMargin: 0,
+        endMargin: 0
       })
       .nestedScroll({ scrollForward: NestedScrollMode.PARENT_FIRST, scrollBackward: NestedScrollMode.PARENT_FIRST })
       .scrollBar(BarState.Off)
@@ -126,12 +138,13 @@ export struct HealthListCard {
       color: $r('sys.color.comp_background_list_card'),
       radius: $r('sys.float.corner_radius_level8')
     })
-    .clickEffect({ level: ClickEffectLevel.MIDDLE })
     .alignItems(HorizontalAlign.Start)
     .clip(true)
     .padding({
       top: $r('sys.float.padding_level8'),
-      bottom: this.bottomPadding()
+      bottom: this.bottomPadding(),
+      left: 24,
+      right: 24
     })
     .width('100%')
   }
