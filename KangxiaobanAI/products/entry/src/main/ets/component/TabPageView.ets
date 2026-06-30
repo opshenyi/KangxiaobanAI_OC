@@ -26,6 +26,7 @@ import { GlobalInfoModel } from '../model/GlobalInfoModel';
 import { PageKeyEnum, PAGE_SCROLLER_MAP } from '../model/TabsBarModel';
 import { TabPageConfig } from '../model/TabPageModel';
 import { BreakpointType } from '../util/BreakpointSystem';
+import { HealthListCard, HealthListCardData, HealthListCardRow } from './HealthListCard';
 
 type StatusLevel = 'normal' | 'warning' | 'danger';
 type TaskSource = 'ai' | 'elder' | 'staff';
@@ -326,6 +327,23 @@ export struct TabPageView {
     ];
   }
 
+  private healthCardData(): HealthListCardData {
+    return {
+      title: '老人健康状态',
+      rows: this.healthRows().map((item: HealthRowData): HealthListCardRow => {
+        return {
+          id: item.id,
+          name: item.name,
+          age: item.age,
+          room: item.room,
+          bed: item.bed,
+          mood: item.mood,
+          status: item.status
+        };
+      })
+    };
+  }
+
   private deviceRows(): DeviceRowData[] {
     return [
       {
@@ -586,39 +604,7 @@ export struct TabPageView {
     .borderRadius(16)
   }
 
-  @Builder
-  private healthListRow(item: HealthRowData, isLast: boolean) {
-    HdsListItemCard({
-      textItem: {
-        primaryText: {
-          text: item.name
-        },
-        secondaryText: {
-          text: `${item.age}岁 · ${item.room} · ${item.bed}`
-        },
-        description: {
-          text: item.mood
-        }
-      },
-      suffixItem: new SuffixText({
-        text: item.status
-      }),
-      cardBorderRadius: 0,
-      cardBackgroundColor: 'rgba(0,0,0,0)',
-      cardHeight: 76,
-      cardPrefixMargin: 0,
-      cardSuffixMargin: 0,
-      onClick: () => {
-        this.selectedResidentId = item.id;
-      }
-    })
-      .border({
-        width: {
-          bottom: isLast ? 0 : 0.5
-        },
-        color: $r('sys.color.comp_divider')
-      })
-  }
+
 
   @Builder
   private deviceRow(item: DeviceRowData, isLast: boolean) {
@@ -1257,20 +1243,14 @@ export struct TabPageView {
       }
 
       ListItem() {
-        Column({ space: 0 }) {
-          Column({ space: 0 }) {
-            this.sectionHeader('老人健康状态', this.healthRows().length)
-            Column({ space: 0 }) {
-              Repeat(this.healthRows())
-                .each((repeatItem: RepeatItem<HealthRowData>) => {
-                  this.healthListRow(repeatItem.item, repeatItem.index === this.healthRows().length - 1)
-                })
+        Column() {
+          HealthListCard({
+            cardData: this.healthCardData(),
+            widthBreakpoint: this.globalInfoModel.widthBreakpoint,
+            onItemClick: (id: string) => {
+              this.selectedResidentId = id;
             }
-          }
-          .padding({ left: 16, right: 16 })
-          .backgroundColor($r('sys.color.comp_background_primary'))
-          .borderRadius(16)
-          .clip(true)
+          })
         }
         .padding({
           left: this.pagePadding(),
