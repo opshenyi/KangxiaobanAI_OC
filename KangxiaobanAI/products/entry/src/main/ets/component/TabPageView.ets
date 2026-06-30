@@ -569,18 +569,23 @@ export struct TabPageView {
 
   @Builder
   private overviewGrid() {
+    const bed: BedSummary = this.bedSummary();
+    const totalDevices: number = this.deviceRows().length;
     Grid() {
       GridItem() {
-        this.overviewCard('入住人数', `${this.bedSummary().occupied}`, '人', '#2FA84F')
+        this.overviewCard('入住人数', `${bed.occupied}`, '人', '#2FA84F',
+          Math.round(bed.occupied / bed.total * 100))
       }
       GridItem() {
-        this.overviewCard('总床位', `${this.bedSummary().total}`, '床', $r('sys.color.font_primary'))
+        this.overviewCard('总床位', `${bed.total}`, '床', $r('sys.color.font_primary'), 100)
       }
       GridItem() {
-        this.overviewCard('空床位', `${this.bedSummary().empty}`, '床', '#1D63ED')
+        this.overviewCard('空床位', `${bed.empty}`, '床', '#1D63ED',
+          Math.round(bed.empty / bed.total * 100))
       }
       GridItem() {
-        this.overviewCard('设备在线', `${this.onlineDeviceCount()}`, '台', '#F5A623')
+        this.overviewCard('设备在线', `${this.onlineDeviceCount()}`, '台', '#F5A623',
+          totalDevices === 0 ? 0 : Math.round(this.onlineDeviceCount() / totalDevices * 100))
       }
     }
     .width('100%')
@@ -592,26 +597,37 @@ export struct TabPageView {
   }
 
   @Builder
-  private overviewCard(label: string, value: string, unit: string, valueColor: ResourceColor) {
-    Column({ space: 6 }) {
-      Text(label)
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_secondary'))
-      Row({ space: 2 }) {
-        Text(value)
-          .fontSize($r('sys.float.Title_L'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor(valueColor)
-        Text(unit)
+  private overviewCard(label: string, value: string, unit: string, valueColor: ResourceColor, ratio: number) {
+    Column({ space: 0 }) {
+      Column({ space: 6 }) {
+        Text(label)
           .fontSize($r('sys.float.Caption_M'))
           .fontColor($r('sys.color.font_secondary'))
-          .margin({ bottom: 3 })
+        Row({ space: 2 }) {
+          Text(value)
+            .fontSize($r('sys.float.Title_L'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor(valueColor)
+          Text(unit)
+            .fontSize($r('sys.float.Caption_M'))
+            .fontColor($r('sys.color.font_secondary'))
+            .margin({ bottom: 3 })
+        }
+        .alignItems(VerticalAlign.Bottom)
       }
-      .alignItems(VerticalAlign.Bottom)
+      .width('100%')
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start)
+
+      DataPanel({ values: [ratio], max: 100, type: DataPanelType.Line })
+        .width('100%')
+        .height(6)
+        .valueColors([valueColor])
     }
     .width('100%')
     .height('100%')
     .padding({ left: 14, right: 14, top: 14, bottom: 14 })
+    .justifyContent(FlexAlign.SpaceBetween)
     .alignItems(HorizontalAlign.Start)
     .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(16)
