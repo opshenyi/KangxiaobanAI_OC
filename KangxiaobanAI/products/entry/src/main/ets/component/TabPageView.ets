@@ -569,23 +569,22 @@ export struct TabPageView {
 
   @Builder
   private overviewGrid() {
-    const bed: BedSummary = this.bedSummary();
-    const totalDevices: number = this.deviceRows().length;
     Grid() {
       GridItem() {
-        this.overviewCard('入住人数', `${bed.occupied}`, '人', '#2FA84F',
-          Math.round(bed.occupied / bed.total * 100))
+        this.overviewCard('入住人数', `${this.bedSummary().occupied}`, '人', '#2FA84F',
+          Math.round(this.bedSummary().occupied / this.bedSummary().total * 100))
       }
       GridItem() {
-        this.overviewCard('总床位', `${bed.total}`, '床', $r('sys.color.font_primary'), 100)
+        this.overviewCard('总床位', `${this.bedSummary().total}`, '床', $r('sys.color.font_primary'), 100)
       }
       GridItem() {
-        this.overviewCard('空床位', `${bed.empty}`, '床', '#1D63ED',
-          Math.round(bed.empty / bed.total * 100))
+        this.overviewCard('空床位', `${this.bedSummary().empty}`, '床', '#1D63ED',
+          Math.round(this.bedSummary().empty / this.bedSummary().total * 100))
       }
       GridItem() {
         this.overviewCard('设备在线', `${this.onlineDeviceCount()}`, '台', '#F5A623',
-          totalDevices === 0 ? 0 : Math.round(this.onlineDeviceCount() / totalDevices * 100))
+          this.deviceRows().length === 0 ? 0 :
+            Math.round(this.onlineDeviceCount() / this.deviceRows().length * 100))
       }
     }
     .width('100%')
