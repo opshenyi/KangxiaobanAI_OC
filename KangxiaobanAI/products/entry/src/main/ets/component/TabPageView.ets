@@ -27,6 +27,8 @@ import { PageKeyEnum, PAGE_SCROLLER_MAP } from '../model/TabsBarModel';
 import { TabPageConfig } from '../model/TabPageModel';
 import { BreakpointType } from '../util/BreakpointSystem';
 import { HealthListCard, HealthListCardData, HealthListCardRow } from './HealthListCard';
+import { DeviceListCard, DeviceListCardData, DeviceListCardRow } from './DeviceListCard';
+import { EventListCard, EventListCardData, EventListCardRow } from './EventListCard';
 
 type StatusLevel = 'normal' | 'warning' | 'danger';
 type TaskSource = 'ai' | 'elder' | 'staff';
@@ -342,6 +344,37 @@ export struct TabPageView {
     };
   }
 
+  private deviceCardData(): DeviceListCardData {
+    return {
+      title: '设备状态',
+      rows: this.deviceRows().map((item: DeviceRowData): DeviceListCardRow => {
+        return {
+          id: item.id,
+          name: item.name,
+          room: item.room,
+          type: item.type,
+          status: item.status,
+          level: item.level,
+          lastUpdate: item.lastUpdate
+        };
+      })
+    };
+  }
+
+  private eventCardData(): EventListCardData {
+    return {
+      title: '今日事件流',
+      rows: this.eventRows().map((item: EventRowData): EventListCardRow => {
+        return {
+          time: item.time,
+          type: item.type,
+          title: item.title,
+          detail: item.detail
+        };
+      })
+    };
+  }
+
   private deviceRows(): DeviceRowData[] {
     return [
       {
@@ -510,24 +543,6 @@ export struct TabPageView {
   // ---------------- shared builders ----------------
 
   @Builder
-  private sectionHeader(title: string, count?: number) {
-    Row() {
-      Text(title)
-        .fontSize($r('sys.float.Title_M'))
-        .fontWeight(FontWeight.Bold)
-        .fontColor($r('sys.color.font_primary'))
-      Blank()
-      if (count !== undefined) {
-        Text(`${count}`)
-          .fontSize($r('sys.float.Body_M'))
-          .fontColor($r('sys.color.font_secondary'))
-      }
-    }
-    .width('100%')
-    .padding({ bottom: $r('sys.float.padding_level4') })
-  }
-
-  @Builder
   private statusTag(text: string, level: StatusLevel) {
     Text(text)
       .fontSize($r('sys.float.Caption_M'))
@@ -603,50 +618,6 @@ export struct TabPageView {
   }
 
 
-
-  @Builder
-  private deviceRow(item: DeviceRowData) {
-    HdsListItemCard({
-      textItem: {
-        primaryText: {
-          text: item.name
-        },
-        secondaryText: {
-          text: `${item.type} · ${item.room}`
-        }
-      },
-      suffixItem: new SuffixText({
-        text: `${item.status} · ${item.lastUpdate}`
-      }),
-      cardBorderRadius: 0,
-      cardBackgroundColor: $r('sys.color.ohos_id_color_background_transparent'),
-      cardHeight: 52,
-      cardPrefixMargin: 0,
-      cardSuffixMargin: 0
-    })
-  }
-
-  @Builder
-  private eventTimelineRow(item: EventRowData) {
-    HdsListItemCard({
-      textItem: {
-        primaryText: {
-          text: item.title
-        },
-        secondaryText: {
-          text: item.detail
-        }
-      },
-      suffixItem: new SuffixText({
-        text: item.time
-      }),
-      cardBorderRadius: 0,
-      cardBackgroundColor: $r('sys.color.ohos_id_color_background_transparent'),
-      cardHeight: 64,
-      cardPrefixMargin: 0,
-      cardSuffixMargin: 0
-    })
-  }
 
   // ---------------- resident builders ----------------
 
@@ -1231,71 +1202,31 @@ export struct TabPageView {
       }
 
       ListItem() {
-        Column({ space: 0 }) {
-          this.sectionHeader('设备状态', this.deviceRows().length)
-          List({ space: 0 }) {
-            Repeat(this.deviceRows())
-              .each((repeatItem: RepeatItem<DeviceRowData>) => {
-                ListItem() {
-                  this.deviceRow(repeatItem.item)
-                }
-              })
-              .key((row: DeviceRowData) => row.id)
-          }
-          .divider({
-            strokeWidth: '1px',
-            color: $r('sys.color.comp_background_tertiary'),
-            startMargin: 0,
-            endMargin: 0
+        Column() {
+          DeviceListCard({
+            cardData: this.deviceCardData(),
+            widthBreakpoint: this.globalInfoModel.widthBreakpoint
           })
-          .scrollBar(BarState.Off)
-          .edgeEffect(EdgeEffect.None)
-          .width('100%')
-          .height(this.deviceRows().length * 52)
         }
-        .padding({ left: 24, right: 24, top: 16, bottom: 8 })
-        .backgroundColor($r('sys.color.comp_background_primary'))
-        .borderRadius(16)
-        .clip(true)
+        .padding({
+          left: this.pagePadding(),
+          right: this.pagePadding()
+        })
       }
-      .padding({
-        left: this.pagePadding(),
-        right: this.pagePadding()
-      })
 
       ListItem() {
-        Column({ space: 0 }) {
-          this.sectionHeader('今日事件流', this.eventRows().length)
-          List({ space: 0 }) {
-            Repeat(this.eventRows())
-              .each((repeatItem: RepeatItem<EventRowData>) => {
-                ListItem() {
-                  this.eventTimelineRow(repeatItem.item)
-                }
-              })
-              .key((row: EventRowData) => `${row.time}-${row.title}`)
-          }
-          .divider({
-            strokeWidth: '1px',
-            color: $r('sys.color.comp_background_tertiary'),
-            startMargin: 0,
-            endMargin: 0
+        Column() {
+          EventListCard({
+            cardData: this.eventCardData(),
+            widthBreakpoint: this.globalInfoModel.widthBreakpoint
           })
-          .scrollBar(BarState.Off)
-          .edgeEffect(EdgeEffect.None)
-          .width('100%')
-          .height(this.eventRows().length * 64)
         }
-        .padding({ left: 24, right: 24, top: 16, bottom: 8 })
-        .backgroundColor($r('sys.color.comp_background_primary'))
-        .borderRadius(16)
-        .clip(true)
+        .padding({
+          left: this.pagePadding(),
+          right: this.pagePadding(),
+          bottom: this.bottomPadding()
+        })
       }
-      .padding({
-        left: this.pagePadding(),
-        right: this.pagePadding(),
-        bottom: this.bottomPadding()
-      })
     }
     .width('100%')
     .height('100%')

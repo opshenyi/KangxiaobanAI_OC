@@ -15,27 +15,29 @@
 
 import {
   HdsListItemCard,
-  SuffixButton
+  SuffixText
 } from '@kit.UIDesignKit';
 import { BreakpointType } from '../util/BreakpointSystem';
 
-export interface HealthListCardData {
+export interface DeviceListCardData {
   title: string;
   subTitle?: string;
-  rows: HealthListCardRow[];
+  rows: DeviceListCardRow[];
 }
 
-export interface HealthListCardRow {
+export interface DeviceListCardRow {
   id: string;
   name: string;
-  age: number;
   room: string;
-  bed: string;
+  type: string;
+  status: string;
+  level: string;
+  lastUpdate: string;
 }
 
 @ComponentV2
-export struct HealthListCard {
-  @Param @Require cardData: HealthListCardData;
+export struct DeviceListCard {
+  @Param @Require cardData: DeviceListCardData;
   @Param @Require widthBreakpoint: WidthBreakpoint;
   @Event onItemClick: (id: string) => void = () => {};
 
@@ -89,25 +91,23 @@ export struct HealthListCard {
 
       List({ space: 0 }) {
         Repeat(this.cardData.rows)
-          .each((repeatItem: RepeatItem<HealthListCardRow>) => {
+          .each((repeatItem: RepeatItem<DeviceListCardRow>) => {
             ListItem() {
               HdsListItemCard({
                 textItem: {
                   primaryText: { text: repeatItem.item.name },
                   secondaryText: {
-                    text: `${repeatItem.item.age}岁 · ${repeatItem.item.room} · ${repeatItem.item.bed}`
+                    text: `${repeatItem.item.type} · ${repeatItem.item.room}`
                   }
                 },
-                suffixItem: new SuffixButton({
-                  text: '查看',
-                  textColor: $r('sys.color.interactive_active')
+                suffixItem: new SuffixText({
+                  text: `${repeatItem.item.status} · ${repeatItem.item.lastUpdate}`
                 }),
                 cardBorderRadius: 0,
                 cardBackgroundColor: $r('sys.color.ohos_id_color_background_transparent'),
                 cardHeight: 68,
                 cardPrefixMargin: -5,
-                cardSuffixMargin: -14,
-                hoverBorderRadius: 0
+                cardSuffixMargin: -14
               })
             }
             .onClick(() => {
@@ -119,7 +119,7 @@ export struct HealthListCard {
             })
             .clip(false)
           })
-          .key((row: HealthListCardRow) => row.id)
+          .key((row: DeviceListCardRow) => row.id)
       }
       .divider({
         strokeWidth: '1px',

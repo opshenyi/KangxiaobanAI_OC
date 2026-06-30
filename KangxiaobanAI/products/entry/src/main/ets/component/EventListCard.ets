@@ -15,29 +15,27 @@
 
 import {
   HdsListItemCard,
-  SuffixButton
+  SuffixText
 } from '@kit.UIDesignKit';
 import { BreakpointType } from '../util/BreakpointSystem';
 
-export interface HealthListCardData {
+export interface EventListCardData {
   title: string;
   subTitle?: string;
-  rows: HealthListCardRow[];
+  rows: EventListCardRow[];
 }
 
-export interface HealthListCardRow {
-  id: string;
-  name: string;
-  age: number;
-  room: string;
-  bed: string;
+export interface EventListCardRow {
+  time: string;
+  type: string;
+  title: string;
+  detail: string;
 }
 
 @ComponentV2
-export struct HealthListCard {
-  @Param @Require cardData: HealthListCardData;
+export struct EventListCard {
+  @Param @Require cardData: EventListCardData;
   @Param @Require widthBreakpoint: WidthBreakpoint;
-  @Event onItemClick: (id: string) => void = () => {};
 
   @Styles
   itemNormalStyle() {
@@ -89,37 +87,32 @@ export struct HealthListCard {
 
       List({ space: 0 }) {
         Repeat(this.cardData.rows)
-          .each((repeatItem: RepeatItem<HealthListCardRow>) => {
+          .each((repeatItem: RepeatItem<EventListCardRow>) => {
             ListItem() {
               HdsListItemCard({
                 textItem: {
-                  primaryText: { text: repeatItem.item.name },
+                  primaryText: { text: repeatItem.item.title },
                   secondaryText: {
-                    text: `${repeatItem.item.age}岁 · ${repeatItem.item.room} · ${repeatItem.item.bed}`
+                    text: repeatItem.item.detail
                   }
                 },
-                suffixItem: new SuffixButton({
-                  text: '查看',
-                  textColor: $r('sys.color.interactive_active')
+                suffixItem: new SuffixText({
+                  text: repeatItem.item.time
                 }),
                 cardBorderRadius: 0,
                 cardBackgroundColor: $r('sys.color.ohos_id_color_background_transparent'),
                 cardHeight: 68,
                 cardPrefixMargin: -5,
-                cardSuffixMargin: -14,
-                hoverBorderRadius: 0
+                cardSuffixMargin: -14
               })
             }
-            .onClick(() => {
-              this.onItemClick(repeatItem.item.id);
-            })
             .stateStyles({
               pressed: this.itemPressedStyle,
               normal: this.itemNormalStyle
             })
             .clip(false)
           })
-          .key((row: HealthListCardRow) => row.id)
+          .key((row: EventListCardRow, index: number) => `${index}-${row.time}-${row.title}`)
       }
       .divider({
         strokeWidth: '1px',
