@@ -1753,6 +1753,7 @@ export struct TabPageView {
       .width('100%')
       .backgroundColor($r('sys.color.comp_background_primary'))
       .borderRadius(16)
+      .clip(true)
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -1882,14 +1883,6 @@ export struct TabPageView {
           width: 0.5,
           color: $r('sys.color.comp_divider')
         })
-      }
-      .padding({
-        left: this.pagePadding(),
-        right: this.pagePadding()
-      })
-
-      ListItem() {
-        this.mineTaskCard()
       }
       .padding({
         left: this.pagePadding(),
