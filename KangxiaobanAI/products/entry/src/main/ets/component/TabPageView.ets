@@ -66,6 +66,24 @@ interface ResidentData {
   nextStep: string;
 }
 
+interface ElderRoomData {
+  name: string;
+  floor: string;
+  occupied: string;
+  capacity: string;
+  status: string;
+  detail: string;
+  devices: RoomDeviceData[];
+}
+
+interface RoomDeviceData {
+  name: string;
+  type: string;
+  status: string;
+  online: boolean;
+  detail: string;
+}
+
 interface TaskData {
   time: string;
   title: string;
@@ -80,22 +98,28 @@ interface TaskLaneData {
   items: TaskData[];
 }
 
+interface AiFeedbackData {
+  elder: string;
+  room: string;
+  type: string;
+  summary: string;
+  suggestedAction: string;
+  priority: string;
+}
+
+interface ElderRequestData {
+  time: string;
+  elder: string;
+  room: string;
+  type: string;
+  detail: string;
+  status: string;
+}
+
 interface SimpleInfoRow {
   label: string;
   value: string;
   note: string;
-}
-
-interface PreferenceData {
-  title: string;
-  value: string;
-  detail: string;
-}
-
-interface ScheduleData {
-  title: string;
-  detail: string;
-  time: string;
 }
 
 interface QuickActionData {
@@ -103,12 +127,6 @@ interface QuickActionData {
   label: string;
   subLabel?: string;
   badge?: string;
-}
-
-interface TaskItemData {
-  title: string;
-  subtitle: string;
-  buttonText: string;
 }
 
 interface SettingItemData {
@@ -128,6 +146,24 @@ interface ProfileSheetItem {
   value?: string;
   isAvatar?: boolean;
   tag?: string;
+}
+
+interface MoodData {
+  name: string;
+  room: string;
+  level: string;
+  mood: string;
+  detail: string;
+  trend: 'up' | 'down' | 'stable';
+}
+
+interface DeviceData {
+  name: string;
+  room: string;
+  type: string;
+  status: string;
+  detail: string;
+  online: boolean;
 }
 
 @ComponentV2
@@ -177,47 +213,7 @@ export struct TabPageView {
   }
 
   private pageBackgroundColor(): ResourceColor {
-    return '#EEF2F6';
-  }
-
-  private taskLaneSurfaceColor(title: string): ResourceColor {
-    if (title === '立即执行') {
-      return '#F6F9FF';
-    }
-    if (title === '今日排程') {
-      return '#F8FBFF';
-    }
-    return '#F4F7FC';
-  }
-
-  private taskLaneBorderColor(title: string): ResourceColor {
-    if (title === '立即执行') {
-      return '#CCD9F5';
-    }
-    if (title === '今日排程') {
-      return '#D7E2F7';
-    }
-    return '#D4DDEB';
-  }
-
-  private taskLaneBadgeBackground(title: string): ResourceColor {
-    if (title === '立即执行') {
-      return '#E6EEFF';
-    }
-    if (title === '今日排程') {
-      return '#EAF1FD';
-    }
-    return '#E8EEF8';
-  }
-
-  private taskLaneBadgeColor(title: string): ResourceColor {
-    if (title === '立即执行') {
-      return '#1D63ED';
-    }
-    if (title === '今日排程') {
-      return '#335C88';
-    }
-    return '#4C6284';
+    return $r('sys.color.background_secondary');
   }
 
   private dashboardMetrics(): MetricTileData[] {
@@ -295,6 +291,64 @@ export struct TabPageView {
         valueText: '68%',
         percent: 68,
         color: '#B7791F'
+      }
+    ];
+  }
+
+  private moodCoverage(): MoodData[] {
+    return [
+      {
+        name: '肖爷爷',
+        room: '3F-302',
+        level: 'A 级关注',
+        mood: '低落',
+        detail: '今日活动量下降 41%，AI 语音关怀后仍建议人工陪伴。',
+        trend: 'down'
+      },
+      {
+        name: '周奶奶',
+        room: '2F-215',
+        level: '睡眠观察',
+        mood: '焦虑',
+        detail: '家属电话未接通，午后持续静坐。',
+        trend: 'down'
+      },
+      {
+        name: '林爷爷',
+        room: '3F-306',
+        level: '关系风险',
+        mood: '回避',
+        detail: '近两日与室友互动减少，语气波动明显。',
+        trend: 'stable'
+      }
+    ];
+  }
+
+  private deviceCoverage(): DeviceData[] {
+    return [
+      {
+        name: '智能床垫',
+        room: '2F-东区',
+        type: '睡眠体征',
+        status: '在线',
+        detail: '36 床在线，2 床需更换电池。',
+        online: true
+      },
+      {
+        name: '毫米波雷达',
+        room: '3F-西区',
+        type: '离床跌倒',
+        status: '异常',
+        detail: '1 台离线，已生成巡检任务。',
+        online: false
+      },
+      {
+        name: '紧急呼叫器',
+        room: '康复单元',
+        type: '主动求助',
+        status: '在线',
+        detail: '18 台在线，今日触发 3 次。',
+        online: true
       }
     ];
   }
@@ -393,6 +447,50 @@ export struct TabPageView {
     ];
   }
 
+  private elderRooms(): ElderRoomData[] {
+    return [
+      {
+        name: '2F-215',
+        floor: '2F 东区',
+        occupied: '4 / 4',
+        capacity: '四人间',
+        status: '稳定',
+        detail: '周奶奶夜间离床增加，床垫与毫米波在线。',
+        devices: [
+          { name: '智能床垫', type: '睡眠体征', status: '在线', online: true, detail: '深睡、心率、呼吸监测正常' },
+          { name: '毫米波雷达', type: '离床跌倒', status: '在线', online: true, detail: '起夜轨迹已记录' },
+          { name: '紧急呼叫器', type: '主动求助', status: '在线', online: true, detail: '床头固定，电量 78%' }
+        ]
+      },
+      {
+        name: '3F-302',
+        floor: '3F 西区',
+        occupied: '2 / 4',
+        capacity: '双人间',
+        status: '关注',
+        detail: '肖爷爷情绪低落，需人工陪伴接手。',
+        devices: [
+          { name: '智能床垫', type: '睡眠体征', status: '在线', online: true, detail: '活动量下降 41%' },
+          { name: '毫米波雷达', type: '离床跌倒', status: '在线', online: true, detail: '午后持续静坐' },
+          { name: '紧急呼叫器', type: '主动求助', status: '低电', online: true, detail: '电量 12%，建议今日更换' }
+        ]
+      },
+      {
+        name: '3F-306',
+        floor: '3F 西区',
+        occupied: '3 / 4',
+        capacity: '四人间',
+        status: '关注',
+        detail: '林爷爷社交回避，室友互动减少。',
+        devices: [
+          { name: '智能床垫', type: '睡眠体征', status: '在线', online: true, detail: '睡眠片段化' },
+          { name: '毫米波雷达', type: '离床跌倒', status: '离线', online: false, detail: '14:20 离线，已派巡检' },
+          { name: '紧急呼叫器', type: '主动求助', status: '在线', online: true, detail: '电量 54%' }
+        ]
+      }
+    ];
+  }
+
   private taskLanes(): TaskLaneData[] {
     return [
       {
@@ -472,93 +570,66 @@ export struct TabPageView {
     ];
   }
 
-  private mineOverview(): PreferenceData[] {
+  private aiFeedbacks(): AiFeedbackData[] {
     return [
       {
-        title: '当前班次',
-        value: '白班中',
-        detail: '07:46 已签到，剩余 4 小时 18 分钟，交接状态正常。'
+        elder: '肖爷爷',
+        room: '3F-302',
+        type: '情绪低落',
+        summary: '今日两次与 AI 对话时语调低沉，活动量下降 41%，语音柔性关怀后仍建议人工接手。',
+        suggestedAction: '由熟悉护工在 15 分钟内二次陪聊，并同步护理站。',
+        priority: '高优先'
       },
       {
-        title: '责任区域',
-        value: 'A栋 2F-3F',
-        detail: '当前覆盖 28 位长者，其中 6 位为重点关注对象。'
+        elder: '周奶奶',
+        room: '2F-215',
+        type: '睡眠异常',
+        summary: '连续三晚起夜增多，深睡时长下降，床垫与毫米波均提示睡眠片段化。',
+        suggestedAction: '晚班重点巡房，确认疼痛与焦虑因素并同步睡眠计划。',
+        priority: '需复核'
       },
       {
-        title: '服务评分',
-        value: '4.9 / 5',
-        detail: '近 30 天累计收到 18 条正向反馈，回访完成率 96%。'
+        elder: '林爷爷',
+        room: '3F-306',
+        type: '社交回避',
+        summary: '近两日与室友互动减少，语气波动明显，AI 建议柔性介入并调整活动搭配。',
+        suggestedAction: '调整活动编组并观察晚间情绪波动。',
+        priority: '可执行'
       }
     ];
   }
 
-  private mineSchedules(): ScheduleData[] {
+  private elderRequests(): ElderRequestData[] {
     return [
       {
-        title: '今日交班复核',
-        detail: '补齐 3F-302 情绪关怀摘要，并同步夜班重点观察名单。',
-        time: '今天 17:20'
+        time: '10:24',
+        elder: '肖爷爷',
+        room: '3F-302',
+        type: '情绪陪伴',
+        detail: '通过床头呼叫器表达想找人聊聊，AI 已进行首轮语音安抚。',
+        status: '待接手'
       },
       {
-        title: '护理培训签到',
-        detail: '主题为认知退化早期识别与柔性沟通，需本人签到。',
-        time: '周五 15:00'
+        time: '09:46',
+        elder: '周奶奶',
+        room: '2F-215',
+        type: '夜间不适',
+        detail: '呼叫器反馈昨晚没睡好，希望今天安排午休和疼痛评估。',
+        status: '已排程'
       },
       {
-        title: '家属回访预约',
-        detail: '为肖爷爷与家属补充一次视频回访，并更新陪伴记录。',
-        time: '周三 19:30'
-      }
-    ];
-  }
-
-  private mineProfiles(): SimpleInfoRow[] {
-    return [
-      {
-        label: '用户身份',
-        value: '白班护工',
-        note: '责任区 A栋 2F-3F，员工编号 CG-021'
-      },
-      {
-        label: '账号权限',
-        value: 'L3 权限',
-        note: '可办理入住、维护关怀记录与交接闭环'
-      },
-      {
-        label: '联系与排班',
-        value: '内线 8021',
-        note: '已绑定护理站、值班组长和紧急联络链路'
-      }
-    ];
-  }
-
-  private minePreferences(): SimpleInfoRow[] {
-    return [
-      {
-        label: '通知策略',
-        value: '关键提醒',
-        note: '保留一级风险、临近截止与家属回访提醒'
-      },
-      {
-        label: '数字记忆助手',
-        value: '已开启',
-        note: '优先提示喜好、家属关系和常聊话题'
-      },
-      {
-        label: '登录设备',
-        value: '2 台',
-        note: '护理站平板与随身终端均已认证登录'
-      },
-      {
-        label: '数据同步',
-        value: '正常',
-        note: '最近一次同步于 09:42，离线记录会自动补传'
+        time: '09:12',
+        elder: '林爷爷',
+        room: '3F-306',
+        type: '活动报名',
+        detail: '主动要求参加书法角活动，希望有人陪同前往。',
+        status: '已确认'
       }
     ];
   }
 
   @Builder
-  private tag(text: string, backgroundColor: ResourceColor, fontColor: ResourceColor = '#305C88') {
+  private tag(text: string, backgroundColor: ResourceColor, fontColor: ResourceColor = $r('sys.color.font_secondary')) {
     Text(text)
       .fontSize($r('sys.float.Caption_M'))
       .fontColor(fontColor)
@@ -577,14 +648,14 @@ export struct TabPageView {
     Column({ space: 4 }) {
       Text(eyebrow)
         .fontSize($r('sys.float.Caption_M'))
-        .fontColor('#6B7C93')
+        .fontColor($r('sys.color.font_secondary'))
       Text(title)
         .fontSize($r('sys.float.Subtitle_S'))
         .fontWeight(FontWeight.Bold)
-        .fontColor('#0F172A')
+        .fontColor($r('sys.color.font_primary'))
       Text(detail)
         .fontSize($r('sys.float.Body_S'))
-        .fontColor('#526277')
+        .fontColor($r('sys.color.font_secondary'))
         .maxLines(2)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
@@ -593,28 +664,33 @@ export struct TabPageView {
 
   @Builder
   private metricTile(item: MetricTileData) {
-    Column({ space: 10 }) {
+    Column({ space: 8 }) {
       Row() {
         Text(item.label)
           .fontSize($r('sys.float.Body_S'))
-          .fontColor('#526277')
+          .fontColor($r('sys.color.font_secondary'))
         Blank()
-        this.tag(item.value, item.toneBackground, item.toneColor)
+        Text(item.value)
+          .fontSize($r('sys.float.Body_L'))
+          .fontWeight(FontWeight.Medium)
+          .fontColor(item.toneColor)
       }
+      .width('100%')
+
       Text(item.note)
         .fontSize($r('sys.float.Body_S'))
-        .fontColor('#0F172A')
+        .fontColor($r('sys.color.font_secondary'))
         .maxLines(2)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
     }
     .alignItems(HorizontalAlign.Start)
     .layoutWeight(1)
     .padding($r('sys.float.padding_level5'))
-    .backgroundColor('#FFFFFF')
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: '#DCE5EF'
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -624,28 +700,30 @@ export struct TabPageView {
       Row() {
         Text(item.title)
           .fontSize($r('sys.float.Body_L'))
-          .fontWeight(FontWeight.Bold)
-          .fontColor('#0F172A')
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('sys.color.font_primary'))
           .layoutWeight(1)
-        this.tag(item.tag, '#EFF4FA', '#45617E')
+        this.tag(item.tag, $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
       }
+      .width('100%')
+
       Text(item.detail)
         .fontSize($r('sys.float.Body_S'))
-        .fontColor('#1F2937')
+        .fontColor($r('sys.color.font_secondary'))
       Divider()
-        .strokeWidth(1)
-        .color('#E4EAF1')
+        .strokeWidth(0.5)
+        .color($r('sys.color.comp_divider'))
       Text(item.extra)
         .fontSize($r('sys.float.Caption_M'))
-        .fontColor('#526277')
+        .fontColor($r('sys.color.font_tertiary'))
     }
     .alignItems(HorizontalAlign.Start)
     .padding($r('sys.float.padding_level6'))
-    .backgroundColor('#FFFFFF')
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: '#DCE5EF'
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -655,24 +733,25 @@ export struct TabPageView {
       Row() {
         Text(item.label)
           .fontSize($r('sys.float.Body_S'))
-          .fontColor('#0F172A')
+          .fontColor($r('sys.color.font_primary'))
         Blank()
         Text(item.valueText)
           .fontSize($r('sys.float.Body_S'))
           .fontWeight(FontWeight.Medium)
-          .fontColor('#0F172A')
+          .fontColor($r('sys.color.font_primary'))
       }
+      .width('100%')
       Stack({ alignContent: Alignment.Start }) {
         Row()
           .width('100%')
-          .height(8)
-          .backgroundColor('#E6ECF3')
-          .borderRadius(4)
+          .height(6)
+          .backgroundColor($r('sys.color.comp_background_secondary'))
+          .borderRadius(3)
         Row()
           .width(`${item.percent}%`)
-          .height(8)
+          .height(6)
           .backgroundColor(item.color)
-          .borderRadius(4)
+          .borderRadius(3)
       }
       .width('100%')
     }
@@ -680,39 +759,73 @@ export struct TabPageView {
 
   @Builder
   private roomRow(item: RoomData, isLast: boolean) {
-    Row({ space: 12 }) {
-      Column({ space: 2 }) {
-        Text(item.name)
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Bold)
-          .fontColor('#0F172A')
-        Text(item.detail)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor('#526277')
+    HdsListItemCard({
+      textItem: {
+        primaryText: { text: item.name },
+        secondaryText: { text: item.detail }
+      },
+      suffixItem: new SuffixText({ text: `${item.occupied} · ${item.status}` }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 52,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0,
+      onClick: () => {
       }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-
-      Column({ space: 2 }) {
-        Text(item.occupied)
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor('#0F172A')
-        Text(item.status)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor('#6B7C93')
-      }
-      .alignItems(HorizontalAlign.End)
-    }
-    .padding({
-      top: 12,
-      bottom: 12
     })
     .border({
       width: {
-        bottom: isLast ? 0 : 1
+        bottom: isLast ? 0 : 0.5
       },
-      color: '#E4EAF1'
+      color: $r('sys.color.comp_divider')
+    })
+  }
+
+  @Builder
+  private moodRow(item: MoodData, isLast: boolean) {
+    HdsListItemCard({
+      textItem: {
+        primaryText: { text: `${item.name} · ${item.room}` },
+        secondaryText: { text: item.detail }
+      },
+      suffixItem: new SuffixText({ text: item.mood }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 64,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0,
+      onClick: () => {
+      }
+    })
+    .border({
+      width: {
+        bottom: isLast ? 0 : 0.5
+      },
+      color: $r('sys.color.comp_divider')
+    })
+  }
+
+  @Builder
+  private deviceRow(item: DeviceData, isLast: boolean) {
+    HdsListItemCard({
+      textItem: {
+        primaryText: { text: `${item.name} · ${item.room}` },
+        secondaryText: { text: item.detail }
+      },
+      suffixItem: new SuffixText({ text: `${item.status}` }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 64,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0,
+      onClick: () => {
+      }
+    })
+    .border({
+      width: {
+        bottom: isLast ? 0 : 0.5
+      },
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -723,40 +836,131 @@ export struct TabPageView {
         Blank()
           .width(4)
           .height(34)
-          .backgroundColor('#1D63ED')
+          .backgroundColor($r('sys.color.icon_emphasize'))
           .borderRadius(2)
           .margin({ right: 10 })
         Column({ space: 4 }) {
           Text(item.name)
             .fontSize($r('sys.float.Body_L'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#0F172A')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
           Text(`${item.room} · ${item.level}`)
             .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#6B7C93')
+            .fontColor($r('sys.color.font_secondary'))
         }
         .alignItems(HorizontalAlign.Start)
         .layoutWeight(1)
-        this.tag(item.status, '#EFF4FA', '#45617E')
+        this.tag(item.status, $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
       }
 
       Text(item.detail)
         .fontSize($r('sys.float.Body_S'))
-        .fontColor('#1F2937')
+        .fontColor($r('sys.color.font_primary'))
       Divider()
-        .strokeWidth(1)
-        .color('#E4EAF1')
+        .strokeWidth(0.5)
+        .color($r('sys.color.comp_divider'))
       Text(item.nextStep)
         .fontSize($r('sys.float.Caption_M'))
-        .fontColor('#526277')
+        .fontColor($r('sys.color.font_secondary'))
     }
     .alignItems(HorizontalAlign.Start)
     .padding($r('sys.float.padding_level6'))
-    .backgroundColor('#F8FBFF')
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: '#DCE7F7'
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
+    })
+  }
+
+  @Builder
+  private roomDeviceRow(item: RoomDeviceData, isLast: boolean) {
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier(item.online ? $r('sys.symbol.checkmark_circle') : $r('sys.symbol.exclamationmark_circle'))
+            .fontColor([item.online ? Color.Green : Color.Orange])
+        }
+      }),
+      textItem: {
+        primaryText: { text: item.name },
+        secondaryText: { text: `${item.type} · ${item.detail}` }
+      },
+      suffixItem: new SuffixText({ text: item.status }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 52,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0,
+      onClick: () => {
+      }
+    })
+    .border({
+      width: {
+        bottom: isLast ? 0 : 0.5
+      },
+      color: $r('sys.color.comp_divider')
+    })
+  }
+
+  @Builder
+  private roomCard(item: ElderRoomData) {
+    Column({ space: 0 }) {
+      Row() {
+        Column({ space: 4 }) {
+          Text(item.name)
+            .fontSize($r('sys.float.Body_L'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
+          Text(`${item.floor} · ${item.capacity}`)
+            .fontSize($r('sys.float.Caption_M'))
+            .fontColor($r('sys.color.font_secondary'))
+        }
+        .alignItems(HorizontalAlign.Start)
+        .layoutWeight(1)
+        this.tag(item.status, $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
+      }
+      .width('100%')
+
+      Row() {
+        Text('入住')
+          .fontSize($r('sys.float.Body_S'))
+          .fontColor($r('sys.color.font_secondary'))
+        Blank()
+        Text(item.occupied)
+          .fontSize($r('sys.float.Body_L'))
+          .fontWeight(FontWeight.Medium)
+          .fontColor($r('sys.color.font_primary'))
+      }
+      .width('100%')
+      .padding({ top: 12, bottom: 12 })
+
+      Text(item.detail)
+        .fontSize($r('sys.float.Body_S'))
+        .fontColor($r('sys.color.font_secondary'))
+        .maxLines(2)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+      Divider()
+        .strokeWidth(0.5)
+        .color($r('sys.color.comp_divider'))
+        .margin({ top: 12, bottom: 4 })
+
+      Column({ space: 0 }) {
+        Repeat(item.devices)
+          .each((repeatItem: RepeatItem<RoomDeviceData>) => {
+            this.roomDeviceRow(repeatItem.item, repeatItem.index === item.devices.length - 1)
+          })
+      }
+    }
+    .alignItems(HorizontalAlign.Start)
+    .padding($r('sys.float.padding_level6'))
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(this.cardRadius())
+    .border({
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -767,17 +971,17 @@ export struct TabPageView {
         Text(item.label)
           .fontSize($r('sys.float.Body_M'))
           .fontWeight(FontWeight.Medium)
-          .fontColor('#0F172A')
+          .fontColor($r('sys.color.font_primary'))
         Text(item.note)
           .fontSize($r('sys.float.Caption_M'))
-          .fontColor('#6B7C93')
+          .fontColor($r('sys.color.font_secondary'))
       }
       .alignItems(HorizontalAlign.Start)
       .layoutWeight(1)
       Text(item.value)
         .fontSize($r('sys.float.Body_L'))
-        .fontWeight(FontWeight.Bold)
-        .fontColor('#0F172A')
+        .fontWeight(FontWeight.Medium)
+        .fontColor($r('sys.color.font_primary'))
     }
     .padding({
       top: 12,
@@ -785,9 +989,9 @@ export struct TabPageView {
     })
     .border({
       width: {
-        bottom: isLast ? 0 : 1
+        bottom: isLast ? 0 : 0.5
       },
-      color: '#E4EAF1'
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -797,19 +1001,19 @@ export struct TabPageView {
       Text(item.time)
         .width(72)
         .fontSize($r('sys.float.Caption_M'))
-        .fontColor('#6B7C93')
+        .fontColor($r('sys.color.font_secondary'))
 
       Column({ space: 6 }) {
         Text(item.title)
           .fontSize($r('sys.float.Body_M'))
           .fontWeight(FontWeight.Medium)
-          .fontColor('#0F172A')
+          .fontColor($r('sys.color.font_primary'))
         Text(item.detail)
           .fontSize($r('sys.float.Caption_M'))
-          .fontColor('#526277')
+          .fontColor($r('sys.color.font_secondary'))
         Text(item.owner)
           .fontSize($r('sys.float.Caption_M'))
-          .fontColor('#6B7C93')
+          .fontColor($r('sys.color.font_tertiary'))
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start)
@@ -820,9 +1024,9 @@ export struct TabPageView {
     })
     .border({
       width: {
-        bottom: isLast ? 0 : 1
+        bottom: isLast ? 0 : 0.5
       },
-      color: '#E4EAF1'
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -833,16 +1037,17 @@ export struct TabPageView {
         Column({ space: 4 }) {
           Text(item.title)
             .fontSize($r('sys.float.Body_L'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#0F172A')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
           Text(item.detail)
             .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#6B7C93')
+            .fontColor($r('sys.color.font_secondary'))
         }
         .alignItems(HorizontalAlign.Start)
         .layoutWeight(1)
-        this.tag(item.badge, this.taskLaneBadgeBackground(item.title), this.taskLaneBadgeColor(item.title))
+        this.tag(item.badge, $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
       }
+      .width('100%')
 
       Column() {
         Repeat(item.items)
@@ -853,159 +1058,139 @@ export struct TabPageView {
     }
     .alignItems(HorizontalAlign.Start)
     .padding($r('sys.float.padding_level6'))
-    .backgroundColor(this.taskLaneSurfaceColor(item.title))
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: this.taskLaneBorderColor(item.title)
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
   }
 
   @Builder
-  private preferenceCard(item: PreferenceData) {
-    Column({ space: 10 }) {
+  private aiFeedbackCard(item: AiFeedbackData) {
+    Column({ space: 12 }) {
       Row() {
-        Text(item.title)
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Bold)
-          .fontColor('#0F172A')
-        Blank()
-        Text(item.value)
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Bold)
-          .fontColor('#1D63ED')
+        Column({ space: 4 }) {
+          Text(`${item.elder} · ${item.room}`)
+            .fontSize($r('sys.float.Body_L'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
+          Text(item.type)
+            .fontSize($r('sys.float.Caption_M'))
+            .fontColor($r('sys.color.font_secondary'))
+        }
+        .alignItems(HorizontalAlign.Start)
+        .layoutWeight(1)
+        this.tag(item.priority, $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
       }
-      Text(item.detail)
+      .width('100%')
+
+      Text(item.summary)
         .fontSize($r('sys.float.Body_S'))
-        .fontColor('#526277')
+        .fontColor($r('sys.color.font_primary'))
+      Divider()
+        .strokeWidth(0.5)
+        .color($r('sys.color.comp_divider'))
+      Text(item.suggestedAction)
+        .fontSize($r('sys.float.Caption_M'))
+        .fontColor($r('sys.color.font_secondary'))
     }
     .alignItems(HorizontalAlign.Start)
-    .padding($r('sys.float.padding_level5'))
-    .backgroundColor('#FFFFFF')
+    .padding($r('sys.float.padding_level6'))
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: '#DCE5EF'
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
   }
 
   @Builder
-  private scheduleRow(item: ScheduleData, isLast: boolean) {
-    Row({ space: 12 }) {
-      Text(item.time)
-        .width(92)
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor('#6B7C93')
-      Column({ space: 4 }) {
-        Text(item.title)
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor('#0F172A')
-        Text(item.detail)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor('#526277')
+  private elderRequestRow(item: ElderRequestData, isLast: boolean) {
+    HdsListItemCard({
+      textItem: {
+        primaryText: { text: `${item.time} · ${item.elder} · ${item.room}` },
+        secondaryText: { text: `${item.type} · ${item.detail}` }
+      },
+      suffixItem: new SuffixText({ text: item.status }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 64,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0,
+      onClick: () => {
       }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-    }
-    .padding({
-      top: 12,
-      bottom: 12
     })
     .border({
       width: {
-        bottom: isLast ? 0 : 1
+        bottom: isLast ? 0 : 0.5
       },
-      color: '#E4EAF1'
+      color: $r('sys.color.comp_divider')
     })
   }
 
   @Builder
   private homeHero() {
-    Column({ space: 20 }) {
+    Column({ space: 18 }) {
       Row() {
         Column({ space: 6 }) {
           Text('首页')
             .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#C3D2E2')
+            .fontColor($r('sys.color.font_secondary'))
           Text('养老院主动服务总览')
             .fontSize($r('sys.float.Title_M'))
             .fontWeight(FontWeight.Bold)
-            .fontColor('#F8FBFF')
+            .fontColor($r('sys.color.font_primary'))
           Text('把任务闭环、风险预警、家属沟通和入住办理收拢到同一套值班视图里。')
             .fontSize($r('sys.float.Body_S'))
-            .fontColor('#D8E4F0')
+            .fontColor($r('sys.color.font_secondary'))
             .maxLines(2)
         }
         .alignItems(HorizontalAlign.Start)
         .layoutWeight(1)
 
-        Column({ space: 4 }) {
-          Text('96%')
-            .fontSize($r('sys.float.Title_L'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#FFFFFF')
-          Text('服务稳定')
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#D8E4F0')
-        }
-        .alignItems(HorizontalAlign.End)
+        this.tag('服务稳定 96%', $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
       }
+      .width('100%')
 
       Row({ space: 14 }) {
-        Column({ space: 4 }) {
-          Text('128')
-            .fontSize(34)
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#FFFFFF')
-          Text('在院长者')
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#D8E4F0')
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start)
-
-        Column({ space: 4 }) {
-          Text('18')
-            .fontSize($r('sys.float.Title_M'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#FFFFFF')
-          Text('待闭环任务')
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#D8E4F0')
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start)
-
-        Column({ space: 4 }) {
-          Text('12')
-            .fontSize($r('sys.float.Title_M'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#FFFFFF')
-          Text('可用床位')
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#D8E4F0')
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start)
+        this.homeHeroStat('128', '在院长者')
+        this.homeHeroStat('18', '待闭环任务')
+        this.homeHeroStat('12', '可用床位')
       }
+      .width('100%')
 
       Flex({ wrap: FlexWrap.Wrap, direction: FlexDirection.Row }) {
-        this.tag('情绪关注 3', '#20496B', '#E6F1FF')
-        this.tag('离床异常 2', '#20496B', '#E6F1FF')
-        this.tag('未接来电 5', '#20496B', '#E6F1FF')
-        this.tag('今日入住 3', '#20496B', '#E6F1FF')
+        this.tag('情绪关注 3', $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
+        this.tag('离床异常 2', $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
+        this.tag('未接来电 5', $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
+        this.tag('今日入住 3', $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
       }
       .width('100%')
     }
     .alignItems(HorizontalAlign.Start)
     .padding($r('sys.float.padding_level6'))
-    .backgroundColor('#16324A')
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: '#244B70'
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
+  }
+
+  @Builder
+  private homeHeroStat(value: string, label: string) {
+    Column({ space: 4 }) {
+      Text(value)
+        .fontSize($r('sys.float.Title_L'))
+        .fontWeight(FontWeight.Bold)
+        .fontColor($r('sys.color.font_primary'))
+      Text(label)
+        .fontSize($r('sys.float.Caption_M'))
+        .fontColor($r('sys.color.font_secondary'))
+    }
+    .layoutWeight(1)
+    .alignItems(HorizontalAlign.Start)
   }
 
   @Builder
@@ -1021,42 +1206,22 @@ export struct TabPageView {
       }
 
       Divider()
-        .strokeWidth(1)
-        .color('#E4EAF1')
+        .strokeWidth(0.5)
+        .color($r('sys.color.comp_divider'))
 
       Row({ space: 12 }) {
-        Column({ space: 4 }) {
-          Text('17:30')
-            .fontSize($r('sys.float.Title_M'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#0F172A')
-          Text('交接截止')
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#6B7C93')
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start)
-
-        Column({ space: 4 }) {
-          Text('03')
-            .fontSize($r('sys.float.Title_M'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#0F172A')
-          Text('主管待批')
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#6B7C93')
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start)
+        this.homeHeroStat('17:30', '交接截止')
+        this.homeHeroStat('03', '主管待批')
       }
+      .width('100%')
     }
     .alignItems(HorizontalAlign.Start)
     .padding($r('sys.float.padding_level6'))
-    .backgroundColor('#FFFFFF')
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: '#DCE5EF'
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -1139,11 +1304,41 @@ export struct TabPageView {
                   })
               }
               .padding($r('sys.float.padding_level6'))
-              .backgroundColor('#FFFFFF')
+              .backgroundColor($r('sys.color.comp_background_primary'))
               .borderRadius(this.cardRadius())
               .border({
-                width: 1,
-                color: '#DCE5EF'
+                width: 0.5,
+                color: $r('sys.color.comp_divider')
+              })
+
+              this.sectionTitle('心情情况', '情绪雷达', '识别需要人工陪伴和情绪干预的长者。')
+              Column() {
+                Repeat(this.moodCoverage())
+                  .each((repeatItem: RepeatItem<MoodData>) => {
+                    this.moodRow(repeatItem.item, repeatItem.index === this.moodCoverage().length - 1)
+                  })
+              }
+              .padding($r('sys.float.padding_level6'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
+              .borderRadius(this.cardRadius())
+              .border({
+                width: 0.5,
+                color: $r('sys.color.comp_divider')
+              })
+
+              this.sectionTitle('设备情况', '物联健康', '床垫、毫米波、呼叫器等设备在线与异常状态。')
+              Column() {
+                Repeat(this.deviceCoverage())
+                  .each((repeatItem: RepeatItem<DeviceData>) => {
+                    this.deviceRow(repeatItem.item, repeatItem.index === this.deviceCoverage().length - 1)
+                  })
+              }
+              .padding($r('sys.float.padding_level6'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
+              .borderRadius(this.cardRadius())
+              .border({
+                width: 0.5,
+                color: $r('sys.color.comp_divider')
               })
             }
             .width(this.isExtraWideLayout() ? 360 : 320)
@@ -1163,11 +1358,41 @@ export struct TabPageView {
                 })
             }
             .padding($r('sys.float.padding_level6'))
-            .backgroundColor('#FFFFFF')
+            .backgroundColor($r('sys.color.comp_background_primary'))
             .borderRadius(this.cardRadius())
             .border({
-              width: 1,
-              color: '#DCE5EF'
+              width: 0.5,
+              color: $r('sys.color.comp_divider')
+            })
+
+            this.sectionTitle('心情情况', '情绪雷达', '识别需要人工陪伴和情绪干预的长者。')
+            Column() {
+              Repeat(this.moodCoverage())
+                .each((repeatItem: RepeatItem<MoodData>) => {
+                  this.moodRow(repeatItem.item, repeatItem.index === this.moodCoverage().length - 1)
+                })
+            }
+            .padding($r('sys.float.padding_level6'))
+            .backgroundColor($r('sys.color.comp_background_primary'))
+            .borderRadius(this.cardRadius())
+            .border({
+              width: 0.5,
+              color: $r('sys.color.comp_divider')
+            })
+
+            this.sectionTitle('设备情况', '物联健康', '床垫、毫米波、呼叫器等设备在线与异常状态。')
+            Column() {
+              Repeat(this.deviceCoverage())
+                .each((repeatItem: RepeatItem<DeviceData>) => {
+                  this.deviceRow(repeatItem.item, repeatItem.index === this.deviceCoverage().length - 1)
+                })
+            }
+            .padding($r('sys.float.padding_level6'))
+            .backgroundColor($r('sys.color.comp_background_primary'))
+            .borderRadius(this.cardRadius())
+            .border({
+              width: 0.5,
+              color: $r('sys.color.comp_divider')
             })
           }
         }
@@ -1192,63 +1417,68 @@ export struct TabPageView {
         Column({ space: 4 }) {
           Text('长者')
             .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#1D63ED')
+            .fontColor($r('sys.color.font_secondary'))
           Text('长者画像与风险分层')
             .fontSize($r('sys.float.Title_M'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#0F172A')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
           Text('更偏“照护判断”的页面，把个体状态、人群分层和下一步建议放在同一块。')
             .fontSize($r('sys.float.Body_S'))
-            .fontColor('#526277')
+            .fontColor($r('sys.color.font_secondary'))
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        this.tag('重点关注 06', '#EAF1FD', '#1D63ED')
+        this.tag('重点关注 06', $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
       }
+      .width('100%')
 
       Column({ space: 10 }) {
         Row() {
           Text('稳定观察')
             .fontSize($r('sys.float.Body_S'))
-            .fontColor('#526277')
+            .fontColor($r('sys.color.font_secondary'))
           Blank()
           Text('116')
             .fontSize($r('sys.float.Title_S'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#0F172A')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
         }
+        .width('100%')
         Row() {
           Text('风险观察')
             .fontSize($r('sys.float.Body_S'))
-            .fontColor('#526277')
+            .fontColor($r('sys.color.font_secondary'))
           Blank()
           Text('12')
             .fontSize($r('sys.float.Title_S'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#0F172A')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
         }
+        .width('100%')
         Row() {
           Text('社交低活跃')
             .fontSize($r('sys.float.Body_S'))
-            .fontColor('#526277')
+            .fontColor($r('sys.color.font_secondary'))
           Blank()
           Text('08')
             .fontSize($r('sys.float.Title_S'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#0F172A')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
         }
+        .width('100%')
       }
       .padding($r('sys.float.padding_level5'))
-      .backgroundColor('#EAF1FD')
+      .backgroundColor($r('sys.color.comp_background_secondary'))
       .borderRadius(14)
+      .width('100%')
     }
     .alignItems(HorizontalAlign.Start)
     .padding($r('sys.float.padding_level6'))
-    .backgroundColor('#FFFFFF')
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: '#DCE5EF'
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -1259,7 +1489,48 @@ export struct TabPageView {
       space: 16
     }) {
       ListItem() {
-        this.elderHero()
+        if (this.isWideLayout()) {
+          Row({ space: 16 }) {
+            this.elderHero()
+            Column() {
+              this.sectionTitle('风险分层矩阵', '人群视图', '院内运营视角，看覆盖面和分组变化。')
+              Column() {
+                Repeat(this.elderGroups())
+                  .each((repeatItem: RepeatItem<SimpleInfoRow>) => {
+                    this.infoRow(repeatItem.item, repeatItem.index === this.elderGroups().length - 1)
+                  })
+              }
+              .padding($r('sys.float.padding_level6'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
+              .borderRadius(this.cardRadius())
+              .border({
+                width: 0.5,
+                color: $r('sys.color.comp_divider')
+              })
+            }
+            .width(this.isExtraWideLayout() ? 360 : 320)
+          }
+        } else {
+          Column({ space: 16 }) {
+            this.elderHero()
+            Column({ space: 12 }) {
+              this.sectionTitle('风险分层矩阵', '人群视图', '更适合主管快速看分组与覆盖情况。')
+              Column() {
+                Repeat(this.elderGroups())
+                  .each((repeatItem: RepeatItem<SimpleInfoRow>) => {
+                    this.infoRow(repeatItem.item, repeatItem.index === this.elderGroups().length - 1)
+                  })
+              }
+              .padding($r('sys.float.padding_level6'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
+              .borderRadius(this.cardRadius())
+              .border({
+                width: 0.5,
+                color: $r('sys.color.comp_divider')
+              })
+            }
+          }
+        }
       }
       .padding({
         left: this.pagePadding(),
@@ -1282,25 +1553,11 @@ export struct TabPageView {
             .layoutWeight(1)
 
             Column({ space: 12 }) {
-              this.sectionTitle('风险分层矩阵', '人群视图', '右侧更偏院内运营视角，用于看覆盖面和分组变化。')
-              Column() {
-                Repeat(this.elderGroups())
-                  .each((repeatItem: RepeatItem<SimpleInfoRow>) => {
-                    this.infoRow(repeatItem.item, repeatItem.index === this.elderGroups().length - 1)
-                  })
-              }
-              .padding($r('sys.float.padding_level6'))
-              .backgroundColor('#FFFFFF')
-              .borderRadius(this.cardRadius())
-              .border({
-                width: 1,
-                color: '#DCE5EF'
-              })
-
+              this.sectionTitle('房间与设备', '房间视角', '每个房间的入住与物联设备状态。')
               Column({ space: 12 }) {
-                Repeat(this.elderActions())
-                  .each((repeatItem: RepeatItem<InsightData>) => {
-                    this.insightCard(repeatItem.item)
+                Repeat(this.elderRooms())
+                  .each((repeatItem: RepeatItem<ElderRoomData>) => {
+                    this.roomCard(repeatItem.item)
                   })
               }
             }
@@ -1309,30 +1566,28 @@ export struct TabPageView {
         } else {
           Column({ space: 12 }) {
             this.sectionTitle('重点关怀名单', '个体视角', '先看具体长者，再看人群分层。')
-            Repeat(this.elderResidents())
-              .each((repeatItem: RepeatItem<ResidentData>) => {
-                this.residentCard(repeatItem.item)
-              })
-            this.sectionTitle('风险分层矩阵', '人群视图', '更适合主管快速看分组与覆盖情况。')
-            Column() {
-              Repeat(this.elderGroups())
-                .each((repeatItem: RepeatItem<SimpleInfoRow>) => {
-                  this.infoRow(repeatItem.item, repeatItem.index === this.elderGroups().length - 1)
+            Column({ space: 12 }) {
+              Repeat(this.elderResidents())
+                .each((repeatItem: RepeatItem<ResidentData>) => {
+                  this.residentCard(repeatItem.item)
                 })
             }
-            .padding($r('sys.float.padding_level6'))
-            .backgroundColor('#FFFFFF')
-            .borderRadius(this.cardRadius())
-            .border({
-              width: 1,
-              color: '#DCE5EF'
-            })
+
+            this.sectionTitle('房间与设备', '房间视角', '每个房间的入住与物联设备状态。')
+            Column({ space: 12 }) {
+              Repeat(this.elderRooms())
+                .each((repeatItem: RepeatItem<ElderRoomData>) => {
+                  this.roomCard(repeatItem.item)
+                })
+            }
 
             this.sectionTitle('个性化建议', '行动建议', '这里不再像首页的警报卡，而更像护理建议单。')
-            Repeat(this.elderActions())
-              .each((repeatItem: RepeatItem<InsightData>) => {
-                this.insightCard(repeatItem.item)
-              })
+            Column({ space: 12 }) {
+              Repeat(this.elderActions())
+                .each((repeatItem: RepeatItem<InsightData>) => {
+                  this.insightCard(repeatItem.item)
+                })
+            }
           }
         }
       }
@@ -1356,29 +1611,30 @@ export struct TabPageView {
         Column({ space: 4 }) {
           Text('任务')
             .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#C7D5F8')
+            .fontColor($r('sys.color.font_secondary'))
           Text('班次执行看板')
             .fontSize($r('sys.float.Title_M'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#FFFFFF')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
           Text('这页不再是信息总览，而是面向执行的工作流看板。')
             .fontSize($r('sys.float.Body_S'))
-            .fontColor('#D5E1FF')
+            .fontColor($r('sys.color.font_secondary'))
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
-        this.tag('SLA 正常', '#213A74', '#D8E5FF')
+        this.tag('SLA 正常', $r('sys.color.comp_background_secondary'), $r('sys.color.font_secondary'))
       }
+      .width('100%')
 
       Row({ space: 12 }) {
         Column({ space: 2 }) {
           Text('4h')
             .fontSize($r('sys.float.Title_L'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#FFFFFF')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
           Text('本班剩余时长')
             .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#D5E1FF')
+            .fontColor($r('sys.color.font_secondary'))
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
@@ -1386,11 +1642,11 @@ export struct TabPageView {
         Column({ space: 2 }) {
           Text('18')
             .fontSize($r('sys.float.Title_L'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#FFFFFF')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
           Text('待办事项')
             .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#D5E1FF')
+            .fontColor($r('sys.color.font_secondary'))
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
@@ -1398,23 +1654,24 @@ export struct TabPageView {
         Column({ space: 2 }) {
           Text('03')
             .fontSize($r('sys.float.Title_L'))
-            .fontWeight(FontWeight.Bold)
-            .fontColor('#FFFFFF')
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
           Text('主管确认')
             .fontSize($r('sys.float.Caption_M'))
-            .fontColor('#D5E1FF')
+            .fontColor($r('sys.color.font_secondary'))
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
       }
+      .width('100%')
     }
     .alignItems(HorizontalAlign.Start)
     .padding($r('sys.float.padding_level6'))
-    .backgroundColor('#17305E')
+    .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(this.cardRadius())
     .border({
-      width: 1,
-      color: '#29457A'
+      width: 0.5,
+      color: $r('sys.color.comp_divider')
     })
   }
 
@@ -1431,6 +1688,70 @@ export struct TabPageView {
         left: this.pagePadding(),
         right: this.pagePadding(),
         top: this.topPadding()
+      })
+
+      ListItem() {
+        if (this.isWideLayout()) {
+          Row({ space: 16 }) {
+            Column({ space: 12 }) {
+              this.sectionTitle('AI 反馈需求', '机器发现的问题', 'AI 根据语音、睡眠和活动数据识别出的长者异常。')
+              Column({ space: 12 }) {
+                Repeat(this.aiFeedbacks())
+                  .each((repeatItem: RepeatItem<AiFeedbackData>) => {
+                    this.aiFeedbackCard(repeatItem.item)
+                  })
+              }
+            }
+            .layoutWeight(1)
+
+            Column({ space: 12 }) {
+              this.sectionTitle('老人主动求助', '长者发起的请求', '通过呼叫器、语音助手或主动表达产生的待办事项。')
+              Column() {
+                Repeat(this.elderRequests())
+                  .each((repeatItem: RepeatItem<ElderRequestData>) => {
+                    this.elderRequestRow(repeatItem.item, repeatItem.index === this.elderRequests().length - 1)
+                  })
+              }
+              .padding($r('sys.float.padding_level6'))
+              .backgroundColor($r('sys.color.comp_background_primary'))
+              .borderRadius(this.cardRadius())
+              .border({
+                width: 0.5,
+                color: $r('sys.color.comp_divider')
+              })
+            }
+            .width(this.isExtraWideLayout() ? 360 : 320)
+          }
+        } else {
+          Column({ space: 12 }) {
+            this.sectionTitle('AI 反馈需求', '机器发现的问题', 'AI 根据语音、睡眠和活动数据识别出的长者异常。')
+            Column({ space: 12 }) {
+              Repeat(this.aiFeedbacks())
+                .each((repeatItem: RepeatItem<AiFeedbackData>) => {
+                  this.aiFeedbackCard(repeatItem.item)
+                })
+            }
+
+            this.sectionTitle('老人主动求助', '长者发起的请求', '通过呼叫器、语音助手或主动表达产生的待办事项。')
+            Column() {
+              Repeat(this.elderRequests())
+                .each((repeatItem: RepeatItem<ElderRequestData>) => {
+                  this.elderRequestRow(repeatItem.item, repeatItem.index === this.elderRequests().length - 1)
+                })
+            }
+            .padding($r('sys.float.padding_level6'))
+            .backgroundColor($r('sys.color.comp_background_primary'))
+            .borderRadius(this.cardRadius())
+            .border({
+              width: 0.5,
+              color: $r('sys.color.comp_divider')
+            })
+          }
+        }
+      }
+      .padding({
+        left: this.pagePadding(),
+        right: this.pagePadding()
       })
 
       ListItem() {
@@ -1509,14 +1830,6 @@ export struct TabPageView {
       { icon: $r('sys.symbol.calendar_badge_clock'), label: '排班表' },
       { icon: $r('sys.symbol.doc_text'), label: '服务记录' },
       { icon: $r('sys.symbol.questionmark_circle'), label: '帮助中心' }
-    ];
-  }
-
-  private taskItems(): TaskItemData[] {
-    return [
-      { title: '完成今日入住登记', subtitle: '待处理 3 位', buttonText: '去完成' },
-      { title: '提交交接班记录', subtitle: '17:30 截止', buttonText: '去完成' },
-      { title: '处理风险观察预警', subtitle: '情绪关注 2 例', buttonText: '去处理' }
     ];
   }
 
@@ -1674,9 +1987,9 @@ export struct TabPageView {
           if (item.tag) {
             Text(item.tag)
               .fontSize(12)
-              .fontColor('#1D63ED')
+              .fontColor($r('sys.color.font_emphasize'))
               .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-              .backgroundColor('#E6EEFF')
+              .backgroundColor($r('sys.color.comp_background_tertiary'))
               .borderRadius(6)
           }
         }
@@ -1818,7 +2131,6 @@ export struct TabPageView {
         iconValue: {
           symbol: new SymbolGlyphModifier(item.icon)
             .fontColor([$r('sys.color.font_primary')])
-            .fontSize(22)
         }
       }),
       textItem: {
@@ -1869,74 +2181,6 @@ export struct TabPageView {
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-  }
-
-  @Builder
-  private mineTaskCard() {
-    Column({ space: 0 }) {
-      Row({ space: 0 }) {
-        Text('我的任务')
-          .fontSize(16)
-          .fontWeight(FontWeight.Bold)
-          .fontColor($r('sys.color.font_primary'))
-          .layoutWeight(1)
-
-        Row({ space: 2 }) {
-          Text('更多')
-            .fontSize(14)
-            .fontColor($r('sys.color.font_secondary'))
-          Text('›')
-            .fontSize(18)
-            .fontColor($r('sys.color.font_tertiary'))
-        }
-        .alignItems(VerticalAlign.Center)
-      }
-      .padding({ left: 16, right: 16, top: 14, bottom: 10 })
-
-      Column({ space: 0 }) {
-        Repeat(this.taskItems())
-          .each((repeatItem: RepeatItem<TaskItemData>) => {
-            this.mineTaskRow(repeatItem.item, repeatItem.index === this.taskItems().length - 1)
-          })
-      }
-    }
-    .width('100%')
-    .backgroundColor($r('sys.color.comp_background_primary'))
-    .borderRadius(16)
-    .border({
-      width: 0.5,
-      color: $r('sys.color.comp_divider')
-    })
-  }
-
-  @Builder
-  private mineTaskRow(item: TaskItemData, isLast: boolean) {
-    Row({ space: 12 }) {
-      Column({ space: 4 }) {
-        Text(item.title)
-          .fontSize(15)
-          .fontColor($r('sys.color.font_primary'))
-        Text(item.subtitle)
-          .fontSize(13)
-          .fontColor($r('sys.color.font_secondary'))
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-
-      Text(item.buttonText)
-        .fontSize(13)
-        .fontColor('#007DFF')
-        .padding({ left: 14, right: 14, top: 6, bottom: 6 })
-        .backgroundColor('#F0F7FF')
-        .borderRadius(16)
-    }
-    .padding({ left: 16, right: 16, top: 12, bottom: 12 })
-    .border({
-      width: {
-        bottom: isLast ? 0 : 0.5
-      },
-      color: $r('sys.color.comp_divider')
-    })
   }
 
   @Builder
