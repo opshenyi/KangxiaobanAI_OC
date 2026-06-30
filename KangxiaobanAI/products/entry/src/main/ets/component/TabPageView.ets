@@ -162,7 +162,7 @@ export struct TabPageView {
   @Param @Require currentTabIndex: number;
   @Param @Require pageKey: PageKeyEnum;
   @Param @Require config: TabPageConfig;
-  @Param onOpenSearch?: () => void;
+  @Param onOpenSearch: () => void = () => {};
   @Local globalInfoModel: GlobalInfoModel =
     AppStorageV2.connect(GlobalInfoModel, StorageKey.GLOBAL_INFO) ?? new GlobalInfoModel();
   @Local homeSearchState: HomeSearchState =
@@ -1290,7 +1290,7 @@ export struct TabPageView {
     .backgroundColor(this.pageBackgroundColor())
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
-    .onScroll((scrollOffset: number, scrollState: ScrollState) => {
+    .onWillScroll((scrollOffset: number, scrollState: ScrollState) => {
       this.homeSearchState.scrollY = scrollOffset;
     })
   }
