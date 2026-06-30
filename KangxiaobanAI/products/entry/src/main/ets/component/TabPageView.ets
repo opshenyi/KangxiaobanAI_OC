@@ -571,16 +571,20 @@ export struct TabPageView {
   private overviewGrid() {
     Grid() {
       GridItem() {
-        this.overviewCard('入住人数', `${this.bedSummary().occupied}`, '人', '#2FA84F')
+        this.overviewCard('入住人数', `${this.bedSummary().occupied}`, '人', '#2FA84F',
+          `剩余 ${this.bedSummary().empty} 床位`)
       }
       GridItem() {
-        this.overviewCard('总床位', `${this.bedSummary().total}`, '床', $r('sys.color.font_primary'))
+        this.overviewCard('总床位', `${this.bedSummary().total}`, '床', $r('sys.color.font_primary'),
+          `已入住 ${this.bedSummary().occupied} 人`)
       }
       GridItem() {
-        this.overviewCard('空床位', `${this.bedSummary().empty}`, '床', '#1D63ED')
+        this.overviewCard('空床位', `${this.bedSummary().empty}`, '床', '#1D63ED',
+          `共 ${this.bedSummary().total} 床位`)
       }
       GridItem() {
-        this.overviewCard('设备在线', `${this.onlineDeviceCount()}`, '台', '#F5A623')
+        this.overviewCard('设备在线', `${this.onlineDeviceCount()}`, '台', '#F5A623',
+          `离线 ${this.deviceRows().length - this.onlineDeviceCount()} 台`)
       }
     }
     .width('100%')
@@ -588,11 +592,11 @@ export struct TabPageView {
     .rowsTemplate('1fr 1fr')
     .columnsGap(12)
     .rowsGap(12)
-    .height(176)
+    .height(200)
   }
 
   @Builder
-  private overviewCard(label: string, value: string, unit: string, valueColor: ResourceColor) {
+  private overviewCard(label: string, value: string, unit: string, valueColor: ResourceColor, subLabel: string) {
     Column({ space: 6 }) {
       Text(label)
         .fontSize($r('sys.float.Caption_M'))
@@ -608,6 +612,19 @@ export struct TabPageView {
           .margin({ bottom: 3 })
       }
       .alignItems(VerticalAlign.Bottom)
+
+      Row({ space: 4 }) {
+        Row()
+          .width(6)
+          .height(6)
+          .backgroundColor(valueColor)
+          .borderRadius(3)
+
+        Text(subLabel)
+          .fontSize($r('sys.float.Caption_S'))
+          .fontColor($r('sys.color.font_secondary'))
+      }
+      .alignItems(VerticalAlign.Center)
     }
     .width('100%')
     .height('100%')
