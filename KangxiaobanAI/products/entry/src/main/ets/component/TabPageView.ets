@@ -571,20 +571,16 @@ export struct TabPageView {
   private overviewGrid() {
     Grid() {
       GridItem() {
-        this.overviewCard('入住人数', `${this.bedSummary().occupied}`, '人', '#2FA84F',
-          Math.round(this.bedSummary().occupied / this.bedSummary().total * 100))
+        this.overviewCard('入住人数', `${this.bedSummary().occupied}`, '人', '#2FA84F')
       }
       GridItem() {
-        this.overviewCard('总床位', `${this.bedSummary().total}`, '床', $r('sys.color.font_primary'), 100)
+        this.overviewCard('总床位', `${this.bedSummary().total}`, '床', $r('sys.color.font_primary'))
       }
       GridItem() {
-        this.overviewCard('空床位', `${this.bedSummary().empty}`, '床', '#1D63ED',
-          Math.round(this.bedSummary().empty / this.bedSummary().total * 100))
+        this.overviewCard('空床位', `${this.bedSummary().empty}`, '床', '#1D63ED')
       }
       GridItem() {
-        this.overviewCard('设备在线', `${this.onlineDeviceCount()}`, '台', '#F5A623',
-          this.deviceRows().length === 0 ? 0 :
-            Math.round(this.onlineDeviceCount() / this.deviceRows().length * 100))
+        this.overviewCard('设备在线', `${this.onlineDeviceCount()}`, '台', '#F5A623')
       }
     }
     .width('100%')
@@ -592,56 +588,15 @@ export struct TabPageView {
     .rowsTemplate('1fr 1fr')
     .columnsGap(12)
     .rowsGap(12)
-    .height(this.overviewGridHeight())
-  }
-
-  private overviewGridHeight(): number {
-    return new BreakpointType<number>({
-      sm: 360,
-      md: 400,
-      lg: 420
-    }).getValue(this.globalInfoModel.widthBreakpoint);
-  }
-
-  private ringSize(): number {
-    return new BreakpointType<number>({
-      sm: 88,
-      md: 104,
-      lg: 112
-    }).getValue(this.globalInfoModel.widthBreakpoint);
-  }
-
-  private ringStrokeWidth(): number {
-    return new BreakpointType<number>({
-      sm: 10,
-      md: 12,
-      lg: 12
-    }).getValue(this.globalInfoModel.widthBreakpoint);
+    .height(176)
   }
 
   @Builder
-  private overviewCard(label: string, value: string, unit: string, valueColor: ResourceColor, ratio: number) {
-    Column({ space: 0 }) {
+  private overviewCard(label: string, value: string, unit: string, valueColor: ResourceColor) {
+    Column({ space: 6 }) {
       Text(label)
         .fontSize($r('sys.float.Caption_M'))
         .fontColor($r('sys.color.font_secondary'))
-
-      Stack({ alignContent: Alignment.Center }) {
-        DataPanel({ values: [ratio], max: 100, type: DataPanelType.Circle })
-          .width(this.ringSize())
-          .height(this.ringSize())
-          .strokeWidth(this.ringStrokeWidth())
-          .valueColors([valueColor])
-          .trackBackgroundColor('rgba(0, 0, 0, 0.06)')
-          .closeEffect(true)
-
-        Text(`${ratio}%`)
-          .fontSize($r('sys.float.Title_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor(valueColor)
-      }
-      .width('100%')
-
       Row({ space: 2 }) {
         Text(value)
           .fontSize($r('sys.float.Title_L'))
@@ -656,9 +611,8 @@ export struct TabPageView {
     }
     .width('100%')
     .height('100%')
-    .padding({ top: 16, bottom: 16 })
-    .justifyContent(FlexAlign.SpaceBetween)
-    .alignItems(HorizontalAlign.Center)
+    .padding({ left: 14, right: 14, top: 14, bottom: 14 })
+    .alignItems(HorizontalAlign.Start)
     .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(16)
   }
