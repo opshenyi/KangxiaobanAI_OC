@@ -582,7 +582,7 @@ struct MainPage {
     })
     .bindToScrollable(PAGE_SCROLLER_MAP.get(PageKeyEnum.ADAPTIVE_TAB) ?? [])
     .hideBackButton(true)
-    .hideTitleBar(this.homeSearchState.isSearchOpen)
+    .hideTitleBar(this.homeSearchState.isSearchOpen, true)
     .titleMode(HdsNavigationTitleMode.MINI)
     .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
     .width('100%')
