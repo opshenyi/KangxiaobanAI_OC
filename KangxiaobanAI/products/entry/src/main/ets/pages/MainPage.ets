@@ -565,7 +565,7 @@ struct MainPage {
     .titleBar({
       content: {
         title: {
-          mainTitle: this.homeSearchState.isSearchOpen ? '' : this.getCurrentPageTitle(),
+          mainTitle: this.getCurrentPageTitle(),
         },
         menu: this.homeSearchMenu(),
       },
@@ -582,6 +582,7 @@ struct MainPage {
     })
     .bindToScrollable(PAGE_SCROLLER_MAP.get(PageKeyEnum.ADAPTIVE_TAB) ?? [])
     .hideBackButton(true)
+    .hideTitleBar(this.homeSearchState.isSearchOpen)
     .titleMode(HdsNavigationTitleMode.MINI)
     .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
     .width('100%')

@@ -1327,7 +1327,7 @@ export struct TabPageView {
       }
       .width('100%')
       .padding({ left: this.pagePadding(), right: this.pagePadding() })
-      .margin({ top: this.contentTopPadding() })
+      .margin({ top: this.topPadding() })
 
       List() {
         ListItem() {
