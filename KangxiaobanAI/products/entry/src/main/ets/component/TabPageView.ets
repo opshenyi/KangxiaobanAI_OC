@@ -327,26 +327,6 @@ export struct TabPageView {
     ];
   }
 
-  private healthIconSymbol(level: StatusLevel): Resource {
-    if (level === 'danger') {
-      return $r('sys.symbol.exclamationmark_triangle_fill');
-    }
-    if (level === 'warning') {
-      return $r('sys.symbol.exclamationmark_circle_fill');
-    }
-    return $r('sys.symbol.checkmark_circle_fill');
-  }
-
-  private healthIconBg(level: StatusLevel): ResourceColor {
-    if (level === 'danger') {
-      return '#D92B2B';
-    }
-    if (level === 'warning') {
-      return '#F5A623';
-    }
-    return '#2FA84F';
-  }
-
   private healthCardData(): HealthListCardData {
     return {
       title: '老人健康状态',
@@ -357,9 +337,7 @@ export struct TabPageView {
           name: item.name,
           age: item.age,
           room: item.room,
-          bed: item.bed,
-          iconSymbol: this.healthIconSymbol(item.level),
-          iconBg: this.healthIconBg(item.level)
+          bed: item.bed
         };
       })
     };

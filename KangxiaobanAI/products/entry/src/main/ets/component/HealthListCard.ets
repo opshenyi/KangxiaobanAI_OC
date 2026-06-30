@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
-import { SymbolGlyphModifier } from '@kit.ArkUI';
 import {
   HdsListItemCard,
-  PrefixCustomBuilder,
   SuffixButton
 } from '@kit.UIDesignKit';
 import { BreakpointType } from '../util/BreakpointSystem';
@@ -33,8 +31,6 @@ export interface HealthListCardRow {
   age: number;
   room: string;
   bed: string;
-  iconSymbol: Resource;
-  iconBg: ResourceColor;
 }
 
 @ComponentV2
@@ -49,20 +45,6 @@ export struct HealthListCard {
       md: 8,
       lg: 8
     }).getValue(this.widthBreakpoint);
-  }
-
-  @Builder
-  private IconBuilder(symbol: Resource, bgColor: ResourceColor) {
-    Stack({ alignContent: Alignment.Center }) {
-      SymbolGlyph(symbol)
-        .fontSize($r('sys.float.Title_M'))
-        .fontColor([$r('sys.color.font_on_primary')])
-        .symbolEffect(new SymbolGlyphModifier(symbol))
-    }
-    .width(40)
-    .height(40)
-    .backgroundColor(bgColor)
-    .borderRadius($r('sys.float.corner_radius_level5'))
   }
 
   build() {
@@ -103,9 +85,6 @@ export struct HealthListCard {
           .each((repeatItem: RepeatItem<HealthListCardRow>) => {
             ListItem() {
               HdsListItemCard({
-                prefixItem: new PrefixCustomBuilder(() => {
-                  this.IconBuilder(repeatItem.item.iconSymbol, repeatItem.item.iconBg);
-                }),
                 textItem: {
                   primaryText: { text: repeatItem.item.name },
                   secondaryText: {
@@ -132,7 +111,7 @@ export struct HealthListCard {
       .divider({
         strokeWidth: '1px',
         color: $r('sys.color.comp_background_tertiary'),
-        startMargin: 56,
+        startMargin: 16,
         endMargin: 16
       })
       .nestedScroll({ scrollForward: NestedScrollMode.PARENT_FIRST, scrollBackward: NestedScrollMode.PARENT_FIRST })
