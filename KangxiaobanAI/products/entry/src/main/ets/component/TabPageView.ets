@@ -532,68 +532,58 @@ export struct TabPageView {
 
   // ---------------- home builders ----------------
 
-  @Builder
-  private bedStatusRow() {
-    Row({ space: 20 }) {
-      // 左侧：环形进度展示入住率
-      Stack({ alignContent: Alignment.Center }) {
-        Progress({ value: this.bedOccupiedPercent(), total: 100, type: ProgressType.Ring })
-          .width(96)
-          .height(96)
-          .color('#2FA84F')
-          .backgroundColor($r('sys.color.comp_background_secondary'))
-          .style({ strokeWidth: 8 })
-        Column() {
-          Text(`${this.bedOccupiedPercent()}%`)
-            .fontSize($r('sys.float.Title_L'))
-            .fontWeight(FontWeight.Medium)
-            .fontColor('#2FA84F')
-          Text('入住率')
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor($r('sys.color.font_secondary'))
-            .margin({ top: 2 })
-        }
-      }
-      .width(96)
-      .height(96)
-
-      // 右侧：三项指标纵向列表
-      Column({ space: 14 }) {
-        this.bedIndicatorItem('已入住', this.bedSummary().occupied, '#2FA84F')
-        this.bedIndicatorItem('空床', this.bedSummary().empty, '#1D63ED')
-        this.bedIndicatorItem('维护', this.bedSummary().maintenance, '#F5A623')
-      }
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.Center)
-    }
-    .width('100%')
-    .padding(20)
-    .backgroundColor($r('sys.color.comp_background_primary'))
+  private onlineDeviceCount(): number {
+    return this.deviceRows().filter((item: DeviceRowData) => item.level === 'normal').length;
   }
 
   @Builder
-  private bedIndicatorItem(label: string, value: number, color: ResourceColor) {
-    Row() {
-      Row()
-        .width(8)
-        .height(8)
-        .borderRadius(4)
-        .backgroundColor(color)
-      Text(label)
-        .fontSize($r('sys.float.Body_S'))
-        .fontColor($r('sys.color.font_secondary'))
-        .margin({ left: 8 })
-      Blank()
-      Text(`${value}`)
-        .fontSize($r('sys.float.Title_M'))
-        .fontWeight(FontWeight.Medium)
-        .fontColor($r('sys.color.font_primary'))
-      Text('床')
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_secondary'))
-        .margin({ left: 2 })
+  private overviewGrid() {
+    Grid() {
+      GridItem() {
+        this.overviewCard('入住人数', `${this.bedSummary().occupied}`, '人', '#2FA84F')
+      }
+      GridItem() {
+        this.overviewCard('总床位', `${this.bedSummary().total}`, '床', $r('sys.color.font_primary'))
+      }
+      GridItem() {
+        this.overviewCard('空床位', `${this.bedSummary().empty}`, '床', '#1D63ED')
+      }
+      GridItem() {
+        this.overviewCard('设备在线', `${this.onlineDeviceCount()}`, '台', '#F5A623')
+      }
     }
     .width('100%')
+    .columnsTemplate('1fr 1fr')
+    .rowsTemplate('1fr 1fr')
+    .columnsGap(12)
+    .rowsGap(12)
+    .height(176)
+  }
+
+  @Builder
+  private overviewCard(label: string, value: string, unit: string, valueColor: ResourceColor) {
+    Column({ space: 6 }) {
+      Text(label)
+        .fontSize($r('sys.float.Caption_M'))
+        .fontColor($r('sys.color.font_secondary'))
+      Row({ space: 2 }) {
+        Text(value)
+          .fontSize($r('sys.float.Title_L'))
+          .fontWeight(FontWeight.Medium)
+          .fontColor(valueColor)
+        Text(unit)
+          .fontSize($r('sys.float.Caption_M'))
+          .fontColor($r('sys.color.font_secondary'))
+          .margin({ bottom: 3 })
+      }
+      .alignItems(VerticalAlign.Bottom)
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ left: 14, right: 14, top: 14, bottom: 14 })
+    .alignItems(HorizontalAlign.Start)
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(16)
   }
 
   @Builder
@@ -1260,20 +1250,15 @@ export struct TabPageView {
       space: 16
     }) {
       ListItem() {
-        Column({ space: 0 }) {
-          this.sectionHeader('床位状态')
-          this.bedStatusRow()
+        Column() {
+          this.overviewGrid()
         }
-        .padding({ left: 16, right: 16 })
-        .backgroundColor($r('sys.color.comp_background_primary'))
-        .borderRadius(16)
-        .clip(true)
+        .padding({
+          left: this.pagePadding(),
+          right: this.pagePadding(),
+          top: this.topPadding()
+        })
       }
-      .padding({
-        left: this.pagePadding(),
-        right: this.pagePadding(),
-        top: this.topPadding()
-      })
 
       ListItem() {
         Column({ space: 0 }) {
