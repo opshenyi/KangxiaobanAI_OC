@@ -597,58 +597,68 @@ export struct TabPageView {
 
   private overviewGridHeight(): number {
     return new BreakpointType<number>({
-      sm: 280,
-      md: 320,
-      lg: 320
+      sm: 360,
+      md: 400,
+      lg: 420
     }).getValue(this.globalInfoModel.widthBreakpoint);
   }
 
   private ringSize(): number {
     return new BreakpointType<number>({
-      sm: 72,
-      md: 84,
-      lg: 88
+      sm: 88,
+      md: 104,
+      lg: 112
+    }).getValue(this.globalInfoModel.widthBreakpoint);
+  }
+
+  private ringStrokeWidth(): number {
+    return new BreakpointType<number>({
+      sm: 10,
+      md: 12,
+      lg: 12
     }).getValue(this.globalInfoModel.widthBreakpoint);
   }
 
   @Builder
   private overviewCard(label: string, value: string, unit: string, valueColor: ResourceColor, ratio: number) {
-    Row({ space: 0 }) {
-      Column({ space: 8 }) {
-        Text(label)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-        Row({ space: 2 }) {
-          Text(value)
-            .fontSize($r('sys.float.Title_L'))
-            .fontWeight(FontWeight.Medium)
-            .fontColor(valueColor)
-          Text(unit)
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor($r('sys.color.font_secondary'))
-            .margin({ bottom: 3 })
-        }
-        .alignItems(VerticalAlign.Bottom)
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-      .justifyContent(FlexAlign.Center)
+    Column({ space: 0 }) {
+      Text(label)
+        .fontSize($r('sys.float.Caption_M'))
+        .fontColor($r('sys.color.font_secondary'))
 
       Stack({ alignContent: Alignment.Center }) {
         DataPanel({ values: [ratio], max: 100, type: DataPanelType.Circle })
           .width(this.ringSize())
           .height(this.ringSize())
+          .strokeWidth(this.ringStrokeWidth())
           .valueColors([valueColor])
+          .trackBackgroundColor('rgba(0, 0, 0, 0.06)')
+          .closeEffect(true)
 
         Text(`${ratio}%`)
-          .fontSize($r('sys.float.Body_M'))
+          .fontSize($r('sys.float.Title_M'))
           .fontWeight(FontWeight.Medium)
           .fontColor(valueColor)
       }
+      .width('100%')
+
+      Row({ space: 2 }) {
+        Text(value)
+          .fontSize($r('sys.float.Title_L'))
+          .fontWeight(FontWeight.Medium)
+          .fontColor(valueColor)
+        Text(unit)
+          .fontSize($r('sys.float.Caption_M'))
+          .fontColor($r('sys.color.font_secondary'))
+          .margin({ bottom: 3 })
+      }
+      .alignItems(VerticalAlign.Bottom)
     }
     .width('100%')
     .height('100%')
-    .padding(16)
+    .padding({ top: 16, bottom: 16 })
+    .justifyContent(FlexAlign.SpaceBetween)
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor($r('sys.color.comp_background_primary'))
     .borderRadius(16)
   }
