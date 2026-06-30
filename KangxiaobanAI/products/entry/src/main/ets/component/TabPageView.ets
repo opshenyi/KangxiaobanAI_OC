@@ -195,6 +195,14 @@ export struct TabPageView {
     return this.globalInfoModel.statusBarHeight + 16;
   }
 
+  private titleBarHeight(): number {
+    return 48;
+  }
+
+  private contentTopPadding(): number {
+    return this.topPadding() + this.titleBarHeight();
+  }
+
   private currentScroller(): Scroller | undefined {
     return PAGE_SCROLLER_MAP.get(this.pageKey)?.[this.currentTabIndex];
   }
@@ -1319,7 +1327,7 @@ export struct TabPageView {
       }
       .width('100%')
       .padding({ left: this.pagePadding(), right: this.pagePadding() })
-      .margin({ top: this.topPadding() })
+      .margin({ top: this.contentTopPadding() })
 
       List() {
         ListItem() {
@@ -1393,7 +1401,7 @@ export struct TabPageView {
         .padding({
           left: this.pagePadding(),
           right: this.pagePadding(),
-          top: this.topPadding() + 56
+          top: this.contentTopPadding()
         })
       }
 
@@ -1514,7 +1522,7 @@ export struct TabPageView {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.topPadding() })
+      .padding({ top: this.contentTopPadding() })
       .backgroundColor(this.pageBackgroundColor())
     } else {
       if (this.selectedResident()) {
@@ -1541,7 +1549,7 @@ export struct TabPageView {
         }
         .width('100%')
         .height('100%')
-        .padding({ top: this.topPadding() })
+        .padding({ top: this.contentTopPadding() })
         .backgroundColor(this.pageBackgroundColor())
       } else {
         List({
@@ -1567,7 +1575,7 @@ export struct TabPageView {
           .padding({
             left: this.pagePadding(),
             right: this.pagePadding(),
-            top: this.topPadding()
+            top: this.contentTopPadding()
           })
 
           ListItem() {
@@ -1659,7 +1667,7 @@ export struct TabPageView {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.topPadding() })
+      .padding({ top: this.contentTopPadding() })
       .backgroundColor(this.pageBackgroundColor())
     } else {
       if (this.selectedTask()) {
@@ -1688,7 +1696,7 @@ export struct TabPageView {
         }
         .width('100%')
         .height('100%')
-        .padding({ top: this.topPadding() })
+        .padding({ top: this.contentTopPadding() })
         .backgroundColor(this.pageBackgroundColor())
       } else {
         List({
@@ -1713,7 +1721,7 @@ export struct TabPageView {
           .padding({
             left: this.pagePadding(),
             right: this.pagePadding(),
-            top: this.topPadding()
+            top: this.contentTopPadding()
           })
 
           ListItem() {
@@ -2104,7 +2112,7 @@ export struct TabPageView {
       .padding({
         left: this.pagePadding(),
         right: this.pagePadding(),
-        top: this.topPadding()
+        top: this.contentTopPadding()
       })
 
       ListItem() {
