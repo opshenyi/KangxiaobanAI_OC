@@ -1493,13 +1493,13 @@ export struct TabPageView {
 
   private quickActions(): QuickActionData[] {
     return [
-      { icon: $r('sys.symbol.square_and_pencil'), label: '入住登记', subLabel: '3 待处理' },
-      { icon: $r('sys.symbol.doc_text'), label: '交接班' },
-      { icon: $r('sys.symbol.bell'), label: '消息通知', subLabel: '5 未读' },
+      { icon: $r('sys.symbol.square_and_pencil'), label: '入住登记' },
+      { icon: $r('sys.symbol.person_2'), label: '我的长者' },
+      { icon: $r('sys.symbol.bell'), label: '消息通知' },
       { icon: $r('sys.symbol.paintpalette'), label: '培训学习' },
-      { icon: $r('sys.symbol.hand_thumbsup'), label: '我的评价', subLabel: '本月' },
-      { icon: $r('sys.symbol.square_and_pencil_fill'), label: '排班表' },
-      { icon: $r('sys.symbol.person_2_fill'), label: '紧急联系' },
+      { icon: $r('sys.symbol.hand_thumbsup'), label: '我的评价' },
+      { icon: $r('sys.symbol.calendar_badge_clock'), label: '排班表' },
+      { icon: $r('sys.symbol.doc_text'), label: '服务记录' },
       { icon: $r('sys.symbol.questionmark_circle'), label: '帮助中心' }
     ];
   }
@@ -1570,27 +1570,12 @@ export struct TabPageView {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start)
 
-        Row({ space: 4 }) {
-          SymbolGlyph($r('sys.symbol.square_and_pencil'))
-            .fontSize(14)
-            .fontColor(['#007DFF'])
-          Text('编辑')
-            .fontSize(13)
-            .fontColor('#007DFF')
-        }
-        .alignItems(VerticalAlign.Center)
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(20)
+          .fontColor([$r('sys.color.font_tertiary')])
       }
       .width('100%')
 
-      Row({ space: 0 }) {
-        this.privilegeItem($r('sys.symbol.person_2_fill'), '我的长者')
-        this.privilegeItem($r('sys.symbol.square_and_pencil'), '我的任务')
-        this.privilegeItem($r('sys.symbol.hand_thumbsup'), '我的评价')
-      }
-      .width('100%')
-      .padding({ top: 12, bottom: 12 })
-      .backgroundColor($r('sys.color.comp_background_secondary'))
-      .borderRadius(12)
     }
     .width('100%')
     .padding(16)
@@ -1922,7 +1907,7 @@ export struct TabPageView {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(this.pageBackgroundColor())
+    .backgroundColor($r('sys.color.background_secondary'))
     .scrollBar(BarState.Off)
     .edgeEffect(EdgeEffect.Spring)
   }
