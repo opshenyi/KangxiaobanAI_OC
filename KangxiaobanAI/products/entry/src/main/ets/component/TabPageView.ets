@@ -244,10 +244,56 @@ export struct TabPageView {
     return '已完成';
   }
 
+  private taskStatusLevel(status: TaskStatus): StatusLevel {
+    if (status === 'done') {
+      return 'normal';
+    }
+    if (status === 'doing') {
+      return 'warning';
+    }
+    return 'danger';
+  }
+
+  private eventTypeIcon(type: EventType): Resource {
+    if (type === 'ai') {
+      return $r('sys.symbol.ellipsis_message_fill');
+    }
+    if (type === 'alert') {
+      return $r('sys.symbol.exclamationmark_triangle_fill');
+    }
+    if (type === 'care') {
+      return $r('sys.symbol.heart_fill');
+    }
+    return $r('sys.symbol.phone_fill');
+  }
+
+  private eventTypeColor(type: EventType): ResourceColor {
+    if (type === 'ai') {
+      return '#1D63ED';
+    }
+    if (type === 'alert') {
+      return '#D92B2B';
+    }
+    if (type === 'care') {
+      return '#0F766E';
+    }
+    return '#B7791F';
+  }
+
   // ---------------- home data ----------------
 
   private bedSummary(): BedSummary {
     return { total: 156, occupied: 128, empty: 24, maintenance: 4 };
+  }
+
+  private bedOccupiedPercent(): number {
+    const bed: BedSummary = this.bedSummary();
+    return Math.round(bed.occupied / bed.total * 100);
+  }
+
+  private bedPercent(value: number): number {
+    const bed: BedSummary = this.bedSummary();
+    return Math.round(value / bed.total * 100);
   }
 
   private healthRows(): HealthRowData[] {
@@ -476,15 +522,6 @@ export struct TabPageView {
   }
 
   @Builder
-  private moodDot(level: StatusLevel) {
-    Row()
-      .width(8)
-      .height(8)
-      .backgroundColor(this.statusColor(level))
-      .borderRadius(4)
-  }
-
-  @Builder
   private divider(isLast: boolean) {
     if (!isLast) {
       Divider()
@@ -497,272 +534,215 @@ export struct TabPageView {
 
   @Builder
   private bedStatusRow() {
-    const bed: BedSummary = this.bedSummary();
-    const occupiedPercent: number = Math.round(bed.occupied / bed.total * 100);
-    Row({ space: 16 }) {
-      Column({ space: 4 }) {
-        Text(`${bed.total}`)
-          .fontSize($r('sys.float.Title_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
-        Text('总床位')
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-      }
-      .width(64)
-      .alignItems(HorizontalAlign.Start)
-
-      Column({ space: 6 }) {
-        Row() {
-          Text(`${occupiedPercent}% 入住`)
-            .fontSize($r('sys.float.Body_S'))
+    Row({ space: 20 }) {
+      // 左侧：环形进度展示入住率
+      Stack({ alignContent: Alignment.Center }) {
+        Progress({ value: this.bedOccupiedPercent(), total: 100, type: ProgressType.Ring })
+          .width(96)
+          .height(96)
+          .color('#2FA84F')
+          .backgroundColor($r('sys.color.comp_background_secondary'))
+          .style({ strokeWidth: 8 })
+        Column() {
+          Text(`${this.bedOccupiedPercent()}%`)
+            .fontSize($r('sys.float.Title_L'))
+            .fontWeight(FontWeight.Medium)
+            .fontColor('#2FA84F')
+          Text('入住率')
+            .fontSize($r('sys.float.Caption_M'))
             .fontColor($r('sys.color.font_secondary'))
-          Blank()
-          Text(`${bed.occupied} / ${bed.total}`)
-            .fontSize($r('sys.float.Body_S'))
-            .fontColor($r('sys.color.font_primary'))
+            .margin({ top: 2 })
         }
-        .width('100%')
-        Stack({ alignContent: Alignment.Start }) {
-          Row()
-            .width('100%')
-            .height(6)
-            .backgroundColor($r('sys.color.comp_background_secondary'))
-            .borderRadius(3)
-          Row()
-            .width(`${occupiedPercent}%`)
-            .height(6)
-            .backgroundColor('#2FA84F')
-            .borderRadius(3)
-        }
-        .width('100%')
+      }
+      .width(96)
+      .height(96)
+
+      // 右侧：三项指标纵向列表
+      Column({ space: 14 }) {
+        this.bedIndicatorItem('已入住', this.bedSummary().occupied, '#2FA84F')
+        this.bedIndicatorItem('空床', this.bedSummary().empty, '#1D63ED')
+        this.bedIndicatorItem('维护', this.bedSummary().maintenance, '#F5A623')
       }
       .layoutWeight(1)
-
-      Column({ space: 4 }) {
-        Text(`${bed.empty}`)
-          .fontSize($r('sys.float.Title_S'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
-        Text('空床')
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-      }
-      .width(56)
-      .alignItems(HorizontalAlign.Start)
-
-      Column({ space: 4 }) {
-        Text(`${bed.maintenance}`)
-          .fontSize($r('sys.float.Title_S'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
-        Text('维护')
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-      }
-      .width(56)
-      .alignItems(HorizontalAlign.Start)
+      .justifyContent(FlexAlign.Center)
     }
     .width('100%')
-    .height(64)
-    .padding({ left: 16, right: 16 })
+    .padding(20)
     .backgroundColor($r('sys.color.comp_background_primary'))
+  }
+
+  @Builder
+  private bedIndicatorItem(label: string, value: number, color: ResourceColor) {
+    Row() {
+      Row()
+        .width(8)
+        .height(8)
+        .borderRadius(4)
+        .backgroundColor(color)
+      Text(label)
+        .fontSize($r('sys.float.Body_S'))
+        .fontColor($r('sys.color.font_secondary'))
+        .margin({ left: 8 })
+      Blank()
+      Text(`${value}`)
+        .fontSize($r('sys.float.Title_M'))
+        .fontWeight(FontWeight.Medium)
+        .fontColor($r('sys.color.font_primary'))
+      Text('床')
+        .fontSize($r('sys.float.Caption_M'))
+        .fontColor($r('sys.color.font_secondary'))
+        .margin({ left: 2 })
+    }
+    .width('100%')
   }
 
   @Builder
   private healthListRow(item: HealthRowData, isLast: boolean) {
-    Row({ space: 12 }) {
-      Column({ space: 4 }) {
-        Text(item.name)
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
-        Text(`${item.age}岁 · ${item.room} · ${item.bed}`)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-
-      Row({ space: 6 }) {
-        this.statusTag(item.status, item.level)
-        Row({ space: 4 }) {
-          this.moodDot(item.moodLevel)
-          Text(item.mood)
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor($r('sys.color.font_secondary'))
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier($r('sys.symbol.person_fill'))
+            .fontColor([this.statusColor(item.level)])
         }
+      }),
+      textItem: {
+        primaryText: {
+          text: item.name
+        },
+        secondaryText: {
+          text: `${item.age}岁 · ${item.room} · ${item.bed} · ${item.mood}`
+        }
+      },
+      suffixItem: new SuffixText({
+        text: item.status
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 52,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0,
+      onClick: () => {
+        this.selectedResidentId = item.id;
       }
-      .alignItems(VerticalAlign.Center)
-    }
-    .width('100%')
-    .height(52)
-    .padding({ left: 16, right: 16 })
-    .backgroundColor($r('sys.color.comp_background_primary'))
-    .onClick(() => {
-      this.selectedResidentId = item.id;
     })
-
-    this.divider(isLast)
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   @Builder
-  private deviceTableHeader() {
-    Row() {
-      Text('设备')
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_secondary'))
-        .width('28%')
-      Text('房间')
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_secondary'))
-        .width('24%')
-      Text('状态')
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_secondary'))
-        .width('24%')
-      Text('更新')
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_secondary'))
-        .layoutWeight(1)
-    }
-    .width('100%')
-    .height(36)
-    .padding({ left: 16, right: 16 })
-    .backgroundColor($r('sys.color.comp_background_secondary'))
-  }
-
-  @Builder
-  private deviceTableRow(item: DeviceRowData, isLast: boolean) {
-    Row() {
-      Text(item.name)
-        .fontSize($r('sys.float.Body_S'))
-        .fontColor($r('sys.color.font_primary'))
-        .width('28%')
-      Text(item.room)
-        .fontSize($r('sys.float.Body_S'))
-        .fontColor($r('sys.color.font_secondary'))
-        .width('24%')
-      Row() {
-        this.statusTag(item.status, item.level)
-      }
-      .width('24%')
-      Text(item.lastUpdate)
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_tertiary'))
-        .layoutWeight(1)
-    }
-    .width('100%')
-    .height(44)
-    .padding({ left: 16, right: 16 })
-    .backgroundColor($r('sys.color.comp_background_primary'))
-
-    this.divider(isLast)
+  private deviceRow(item: DeviceRowData, isLast: boolean) {
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier($r('sys.symbol.dot_grid_2x2'))
+            .fontColor([this.statusColor(item.level)])
+        }
+      }),
+      textItem: {
+        primaryText: {
+          text: item.name
+        },
+        secondaryText: {
+          text: `${item.type} · ${item.room}`
+        }
+      },
+      suffixItem: new SuffixText({
+        text: `${item.status} · ${item.lastUpdate}`
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 52,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0
+    })
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   @Builder
   private eventTimelineRow(item: EventRowData, isLast: boolean) {
-    Row({ space: 0 }) {
-      Column({ space: 0 }) {
-        Text(item.time)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-          .width(48)
-        Row()
-          .width(2)
-          .height('100%')
-          .backgroundColor($r('sys.color.comp_divider'))
-      }
-      .width(64)
-      .height('100%')
-      .alignItems(HorizontalAlign.Center)
-
-      Column({ space: 4 }) {
-        Row({ space: 8 }) {
-          Text(item.title)
-            .fontSize($r('sys.float.Body_M'))
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_primary'))
-          this.eventTypeTag(item.type)
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier(this.eventTypeIcon(item.type))
+            .fontColor([this.eventTypeColor(item.type)])
         }
-        Text(item.detail)
-          .fontSize($r('sys.float.Body_S'))
-          .fontColor($r('sys.color.font_secondary'))
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-      .padding({ top: 4, bottom: 12 })
-    }
-    .width('100%')
-    .backgroundColor($r('sys.color.comp_background_primary'))
-
-    if (!isLast) {
-      Divider()
-        .strokeWidth(0.5)
-        .color($r('sys.color.comp_divider'))
-        .margin({ left: 64 })
-    }
-  }
-
-  @Builder
-  private eventTypeTag(type: EventType) {
-    let label: string = '系统';
-    let color: ResourceColor = $r('sys.color.font_secondary');
-    let bg: ResourceColor = $r('sys.color.comp_background_secondary');
-    if (type === 'ai') {
-      label = 'AI';
-      color = '#1D63ED';
-      bg = '#EAF1FD';
-    } else if (type === 'alert') {
-      label = '异常';
-      color = '#D92B2B';
-      bg = '#FCE8E8';
-    } else if (type === 'care') {
-      label = '护理';
-      color = '#0F766E';
-      bg = '#E9F7F1';
-    } else if (type === 'family') {
-      label = '家属';
-      color = '#B7791F';
-      bg = '#FDEFD8';
-    }
-    Text(label)
-      .fontSize(10)
-      .fontColor(color)
-      .padding({ left: 6, right: 6, top: 1, bottom: 1 })
-      .backgroundColor(bg)
-      .borderRadius(4)
+      }),
+      textItem: {
+        primaryText: {
+          text: item.title
+        },
+        secondaryText: {
+          text: item.detail
+        }
+      },
+      suffixItem: new SuffixText({
+        text: item.time
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 64,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0
+    })
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   // ---------------- resident builders ----------------
 
   @Builder
   private residentListRow(item: ResidentData, isLast: boolean) {
-    Row({ space: 12 }) {
-      Column({ space: 4 }) {
-        Text(item.name)
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
-        Text(`${item.age}岁 · ${item.room} · ${item.bed}`)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier($r('sys.symbol.person_fill'))
+            .fontColor([this.statusColor(item.level)])
+        }
+      }),
+      textItem: {
+        primaryText: {
+          text: item.name
+        },
+        secondaryText: {
+          text: `${item.age}岁 · ${item.room} · ${item.bed}`
+        }
+      },
+      suffixItem: new SuffixText({
+        text: item.status
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: this.selectedResidentId === item.id ?
+        $r('sys.color.comp_background_secondary') : 'rgba(0,0,0,0)',
+      cardHeight: 52,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0,
+      onClick: () => {
+        this.selectedResidentId = item.id;
       }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-
-      this.statusTag(item.status, item.level)
-    }
-    .width('100%')
-    .height(52)
-    .padding({ left: 16, right: 16 })
-    .backgroundColor(this.selectedResidentId === item.id ?
-      $r('sys.color.comp_background_secondary') : $r('sys.color.comp_background_primary'))
-    .onClick(() => {
-      this.selectedResidentId = item.id;
     })
-
-    this.divider(isLast)
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   @Builder
@@ -790,16 +770,14 @@ export struct TabPageView {
   private filterBar(options: string[], values: string[], selected: string, onChange: (value: string) => void) {
     Row({ space: 8 }) {
       ForEach(options, (label: string, index: number) => {
-        const value: string = values[index];
-        const isSelected: boolean = selected === value;
         Text(label)
           .fontSize($r('sys.float.Body_S'))
-          .fontColor(isSelected ? $r('sys.color.font_on_primary') : $r('sys.color.font_secondary'))
+          .fontColor(selected === values[index] ? $r('sys.color.font_on_primary') : $r('sys.color.font_secondary'))
           .padding({ left: 12, right: 12, top: 6, bottom: 6 })
-          .backgroundColor(isSelected ? $r('sys.color.font_primary') : $r('sys.color.comp_background_primary'))
+          .backgroundColor(selected === values[index] ? $r('sys.color.font_primary') : $r('sys.color.comp_background_primary'))
           .borderRadius(6)
           .onClick(() => {
-            onChange(value);
+            onChange(values[index]);
           })
       }, (item: string, index: number) => index.toString())
     }
@@ -859,24 +837,33 @@ export struct TabPageView {
     .width('100%')
     .padding({ left: 16, right: 16 })
     .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(16)
+    .clip(true)
   }
 
   @Builder
   private descriptionRow(label: string, value: string, isLast: boolean) {
-    Row() {
-      Text(label)
-        .fontSize($r('sys.float.Body_S'))
-        .fontColor($r('sys.color.font_secondary'))
-        .width(96)
-      Text(value)
-        .fontSize($r('sys.float.Body_S'))
-        .fontColor($r('sys.color.font_primary'))
-        .layoutWeight(1)
-    }
-    .width('100%')
-    .height(44)
-
-    this.divider(isLast)
+    HdsListItemCard({
+      textItem: {
+        primaryText: {
+          text: label
+        }
+      },
+      suffixItem: new SuffixText({
+        text: value
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 44,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0
+    })
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   @Builder
@@ -898,55 +885,43 @@ export struct TabPageView {
     .width('100%')
     .padding({ left: 16, right: 16 })
     .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(16)
+    .clip(true)
   }
 
   @Builder
   private healthRecordRow(item: HealthRecord, isLast: boolean) {
-    Row({ space: 0 }) {
-      Column({ space: 0 }) {
-        Text(item.time.split(' ')[1])
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-          .width(40)
-        Text(item.time.split(' ')[0].slice(5))
-          .fontSize(10)
-          .fontColor($r('sys.color.font_tertiary'))
-          .width(40)
-        Row()
-          .width(2)
-          .height('100%')
-          .backgroundColor($r('sys.color.comp_divider'))
-      }
-      .width(56)
-      .height('100%')
-      .alignItems(HorizontalAlign.Center)
-
-      Column({ space: 4 }) {
-        Row({ space: 8 }) {
-          Text(item.type)
-            .fontSize($r('sys.float.Body_M'))
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_primary'))
-          Text(item.operator)
-            .fontSize($r('sys.float.Caption_M'))
-            .fontColor($r('sys.color.font_secondary'))
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier($r('sys.symbol.checkmark_circle_fill'))
+            .fontColor([$r('sys.color.font_secondary')])
         }
-        Text(item.content)
-          .fontSize($r('sys.float.Body_S'))
-          .fontColor($r('sys.color.font_secondary'))
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-      .padding({ top: 4, bottom: 12 })
-    }
-    .width('100%')
-
-    if (!isLast) {
-      Divider()
-        .strokeWidth(0.5)
-        .color($r('sys.color.comp_divider'))
-        .margin({ left: 56 })
-    }
+      }),
+      textItem: {
+        primaryText: {
+          text: `${item.type} · ${item.operator}`
+        },
+        secondaryText: {
+          text: item.content
+        }
+      },
+      suffixItem: new SuffixText({
+        text: item.time.split(' ')[0].slice(5) + ' ' + item.time.split(' ')[1]
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 64,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0
+    })
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   @Builder
@@ -968,31 +943,43 @@ export struct TabPageView {
     .width('100%')
     .padding({ left: 16, right: 16 })
     .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(16)
+    .clip(true)
   }
 
   @Builder
   private moodRecordRow(item: MoodRecord, isLast: boolean) {
-    Row({ space: 12 }) {
-      Text(item.time)
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_secondary'))
-        .width(72)
-      Row({ space: 4 }) {
-        this.moodDot(item.level)
-        Text(item.mood)
-          .fontSize($r('sys.float.Body_S'))
-          .fontColor($r('sys.color.font_primary'))
-      }
-      .width(72)
-      Text(item.note)
-        .fontSize($r('sys.float.Body_S'))
-        .fontColor($r('sys.color.font_secondary'))
-        .layoutWeight(1)
-    }
-    .width('100%')
-    .height(44)
-
-    this.divider(isLast)
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier($r('sys.symbol.heart_fill'))
+            .fontColor([this.statusColor(item.level)])
+        }
+      }),
+      textItem: {
+        primaryText: {
+          text: item.mood
+        },
+        secondaryText: {
+          text: item.note
+        }
+      },
+      suffixItem: new SuffixText({
+        text: item.time
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 52,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0
+    })
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   @Builder
@@ -1014,74 +1001,107 @@ export struct TabPageView {
     .width('100%')
     .padding({ left: 16, right: 16 })
     .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(16)
+    .clip(true)
   }
 
   @Builder
   private deviceTableRowSmall(item: RoomDeviceData, isLast: boolean) {
-    Row() {
-      Text(item.name)
-        .fontSize($r('sys.float.Body_S'))
-        .fontColor($r('sys.color.font_primary'))
-        .width('30%')
-      Text(item.type)
-        .fontSize($r('sys.float.Caption_M'))
-        .fontColor($r('sys.color.font_secondary'))
-        .width('24%')
-      this.statusTag(item.status, item.level)
-      Blank()
-      if (item.battery !== undefined) {
-        Text(`${item.battery}%`)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_tertiary'))
-      }
-    }
-    .width('100%')
-    .height(44)
-
-    this.divider(isLast)
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier($r('sys.symbol.dot_grid_2x2'))
+            .fontColor([this.statusColor(item.level)])
+        }
+      }),
+      textItem: {
+        primaryText: {
+          text: item.name
+        },
+        secondaryText: {
+          text: item.type
+        }
+      },
+      suffixItem: new SuffixText({
+        text: `${item.status}${item.battery !== undefined ? ' · ' + item.battery + '%' : ''}`
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 44,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0
+    })
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   // ---------------- task builders ----------------
 
   @Builder
   private taskListRow(item: CareTask, isLast: boolean) {
-    Row({ space: 12 }) {
-      Column({ space: 4 }) {
-        Row({ space: 8 }) {
-          Text(item.title)
-            .fontSize($r('sys.float.Body_M'))
-            .fontWeight(FontWeight.Medium)
-            .fontColor($r('sys.color.font_primary'))
-          this.statusTag(this.statusText(item.status), item.status === 'done' ? 'normal' :
-            (item.status === 'doing' ? 'warning' : 'danger'))
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier(this.taskSourceIcon(item.source))
+            .fontColor([this.statusColor(this.taskStatusLevel(item.status))])
         }
-        Text(`${item.elder} · ${item.room} · ${item.time}`)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-        Text(item.assignee)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_tertiary'))
+      }),
+      textItem: {
+        primaryText: {
+          text: item.title
+        },
+        secondaryText: {
+          text: `${item.elder} · ${item.room} · ${item.time}`
+        },
+        description: {
+          text: item.assignee
+        }
+      },
+      suffixItem: new SuffixText({
+        text: `${this.statusText(item.status)} · ${this.priorityText(item.priority)}`
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: this.selectedTaskId === item.id ?
+        $r('sys.color.comp_background_secondary') : 'rgba(0,0,0,0)',
+      cardHeight: 76,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0,
+      onClick: () => {
+        this.selectedTaskId = item.id;
       }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-
-      Column({ space: 4 }) {
-        Text(this.sourceText(item.source))
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-        this.statusTag(item.priority === 'danger' ? '高' : (item.priority === 'warning' ? '中' : '低'), item.priority)
-      }
-      .alignItems(HorizontalAlign.End)
-    }
-    .width('100%')
-    .padding(16)
-    .backgroundColor(this.selectedTaskId === item.id ?
-      $r('sys.color.comp_background_secondary') : $r('sys.color.comp_background_primary'))
-    .onClick(() => {
-      this.selectedTaskId = item.id;
     })
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
+  }
 
-    this.divider(isLast)
+  private priorityText(priority: StatusLevel): string {
+    if (priority === 'danger') {
+      return '高';
+    }
+    if (priority === 'warning') {
+      return '中';
+    }
+    return '低';
+  }
+
+  private taskSourceIcon(source: TaskSource): Resource {
+    if (source === 'ai') {
+      return $r('sys.symbol.ellipsis_message_fill');
+    }
+    if (source === 'elder') {
+      return $r('sys.symbol.bell');
+    }
+    return $r('sys.symbol.person_fill');
   }
 
   @Builder
@@ -1143,6 +1163,8 @@ export struct TabPageView {
     .width('100%')
     .padding({ left: 16, right: 16 })
     .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(16)
+    .clip(true)
   }
 
   @Builder
@@ -1164,46 +1186,43 @@ export struct TabPageView {
     .width('100%')
     .padding({ left: 16, right: 16 })
     .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(16)
+    .clip(true)
   }
 
   @Builder
   private taskTimelineRow(item: TaskTimelineItem, isLast: boolean) {
-    Row({ space: 0 }) {
-      Column({ space: 0 }) {
-        Text(item.time)
-          .fontSize($r('sys.float.Caption_M'))
-          .fontColor($r('sys.color.font_secondary'))
-          .width(48)
-        Row()
-          .width(2)
-          .height('100%')
-          .backgroundColor($r('sys.color.comp_divider'))
-      }
-      .width(64)
-      .height('100%')
-      .alignItems(HorizontalAlign.Center)
-
-      Column({ space: 4 }) {
-        Text(item.actor)
-          .fontSize($r('sys.float.Body_M'))
-          .fontWeight(FontWeight.Medium)
-          .fontColor($r('sys.color.font_primary'))
-        Text(item.action)
-          .fontSize($r('sys.float.Body_S'))
-          .fontColor($r('sys.color.font_secondary'))
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
-      .padding({ top: 4, bottom: 12 })
-    }
-    .width('100%')
-
-    if (!isLast) {
-      Divider()
-        .strokeWidth(0.5)
-        .color($r('sys.color.comp_divider'))
-        .margin({ left: 64 })
-    }
+    HdsListItemCard({
+      prefixItem: new PrefixIcon({
+        iconSize: IconSize.SYSTEM_ICON,
+        iconValue: {
+          symbol: new SymbolGlyphModifier($r('sys.symbol.clock_fill'))
+            .fontColor([$r('sys.color.font_secondary')])
+        }
+      }),
+      textItem: {
+        primaryText: {
+          text: item.actor
+        },
+        secondaryText: {
+          text: item.action
+        }
+      },
+      suffixItem: new SuffixText({
+        text: item.time
+      }),
+      cardBorderRadius: 0,
+      cardBackgroundColor: 'rgba(0,0,0,0)',
+      cardHeight: 60,
+      cardPrefixMargin: 0,
+      cardSuffixMargin: 0
+    })
+      .border({
+        width: {
+          bottom: isLast ? 0 : 0.5
+        },
+        color: $r('sys.color.comp_divider')
+      })
   }
 
   @Builder
@@ -1241,41 +1260,19 @@ export struct TabPageView {
       space: 16
     }) {
       ListItem() {
-        Row() {
-          Column({ space: 4 }) {
-            Text('首页')
-              .fontSize($r('sys.float.Caption_M'))
-              .fontColor($r('sys.color.font_secondary'))
-            Text('养老院系统总览')
-              .fontSize($r('sys.float.Title_M'))
-              .fontWeight(FontWeight.Medium)
-              .fontColor($r('sys.color.font_primary'))
-          }
-          .alignItems(HorizontalAlign.Start)
-          .layoutWeight(1)
-          this.statusTag('服务稳定', 'normal')
-        }
-        .width('100%')
-        .padding({ left: 16, right: 16, top: 12, bottom: 12 })
-        .backgroundColor($r('sys.color.comp_background_primary'))
-      }
-      .padding({
-        left: this.pagePadding(),
-        right: this.pagePadding(),
-        top: this.topPadding()
-      })
-
-      ListItem() {
         Column({ space: 0 }) {
           this.sectionHeader('床位状态')
           this.bedStatusRow()
         }
         .padding({ left: 16, right: 16 })
         .backgroundColor($r('sys.color.comp_background_primary'))
+        .borderRadius(16)
+        .clip(true)
       }
       .padding({
         left: this.pagePadding(),
-        right: this.pagePadding()
+        right: this.pagePadding(),
+        top: this.topPadding()
       })
 
       ListItem() {
@@ -1290,6 +1287,8 @@ export struct TabPageView {
         }
         .padding({ left: 16, right: 16 })
         .backgroundColor($r('sys.color.comp_background_primary'))
+        .borderRadius(16)
+        .clip(true)
       }
       .padding({
         left: this.pagePadding(),
@@ -1299,16 +1298,17 @@ export struct TabPageView {
       ListItem() {
         Column({ space: 0 }) {
           this.sectionHeader('设备状态', this.deviceRows().length)
-          this.deviceTableHeader()
           Column({ space: 0 }) {
             Repeat(this.deviceRows())
               .each((repeatItem: RepeatItem<DeviceRowData>) => {
-                this.deviceTableRow(repeatItem.item, repeatItem.index === this.deviceRows().length - 1)
+                this.deviceRow(repeatItem.item, repeatItem.index === this.deviceRows().length - 1)
               })
           }
         }
         .padding({ left: 16, right: 16 })
         .backgroundColor($r('sys.color.comp_background_primary'))
+        .borderRadius(16)
+        .clip(true)
       }
       .padding({
         left: this.pagePadding(),
@@ -1327,6 +1327,8 @@ export struct TabPageView {
         }
         .padding({ left: 16, right: 16, bottom: 16 })
         .backgroundColor($r('sys.color.comp_background_primary'))
+        .borderRadius(16)
+        .clip(true)
       }
       .padding({
         left: this.pagePadding(),
@@ -1373,11 +1375,14 @@ export struct TabPageView {
                     this.residentListRow(repeatItem.item, repeatItem.index === this.filteredResidents().length - 1)
                   })
               }
+              .width('100%')
+              .backgroundColor($r('sys.color.comp_background_primary'))
+              .borderRadius(16)
+              .clip(true)
             }
           }
           .width('100%')
           .layoutWeight(1)
-          .backgroundColor($r('sys.color.comp_background_primary'))
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring)
         }
@@ -1466,6 +1471,8 @@ export struct TabPageView {
             }
             .padding({ left: 16, right: 16 })
             .backgroundColor($r('sys.color.comp_background_primary'))
+            .borderRadius(16)
+            .clip(true)
           }
           .padding({
             left: this.pagePadding(),
@@ -1513,11 +1520,14 @@ export struct TabPageView {
                     this.taskListRow(repeatItem.item, repeatItem.index === this.filteredTasks().length - 1)
                   })
               }
+              .width('100%')
+              .backgroundColor($r('sys.color.comp_background_primary'))
+              .borderRadius(16)
+              .clip(true)
             }
           }
           .width('100%')
           .layoutWeight(1)
-          .backgroundColor($r('sys.color.comp_background_primary'))
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.Spring)
         }
@@ -1605,7 +1615,10 @@ export struct TabPageView {
                   this.taskListRow(repeatItem.item, repeatItem.index === this.filteredTasks().length - 1)
                 })
             }
+            .width('100%')
             .backgroundColor($r('sys.color.comp_background_primary'))
+            .borderRadius(16)
+            .clip(true)
           }
           .padding({
             left: this.pagePadding(),
