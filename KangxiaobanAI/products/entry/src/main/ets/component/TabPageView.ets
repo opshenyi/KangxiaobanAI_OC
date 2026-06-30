@@ -123,6 +123,13 @@ interface SettingGroupData {
   items: SettingItemData[];
 }
 
+interface ProfileSheetItem {
+  label: string;
+  value?: string;
+  isAvatar?: boolean;
+  tag?: string;
+}
+
 @ComponentV2
 export struct TabPageView {
   @Param @Require currentTabIndex: number;
@@ -130,6 +137,7 @@ export struct TabPageView {
   @Param @Require config: TabPageConfig;
   @Local globalInfoModel: GlobalInfoModel =
     AppStorageV2.connect(GlobalInfoModel, StorageKey.GLOBAL_INFO) ?? new GlobalInfoModel();
+  @Local isProfileSheetOpen: boolean = false;
 
   private topPadding(): number {
     return this.globalInfoModel.statusBarHeight + 68;
@@ -1583,6 +1591,109 @@ export struct TabPageView {
     .borderRadius(16)
     .border({
       width: 0.5,
+      color: $r('sys.color.comp_divider')
+    })
+    .onClick(() => {
+      this.isProfileSheetOpen = true;
+    })
+    .bindSheet(this.isProfileSheetOpen, this.profileSheetBuilder, {
+      height: SheetSize.MEDIUM,
+      title: { title: '个人信息' },
+      showClose: true,
+      dragBar: true,
+      onDisappear: () => {
+        this.isProfileSheetOpen = false;
+      }
+    })
+  }
+
+  @Builder
+  private profileSheetBuilder() {
+    Column({ space: 16 }) {
+      this.profileSheetGroup([
+        { label: '形象', value: '', isAvatar: true }
+      ])
+
+      this.profileSheetGroup([
+        { label: '昵称', value: '刘婷' },
+        { label: '性别', value: '女' },
+        { label: '出生日期', value: '1995-08-12' }
+      ])
+
+      this.profileSheetGroup([
+        { label: '手机号', value: '138****8021' },
+        { label: '实名认证', value: '**婷', tag: '已实名' }
+      ])
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ left: 16, right: 16, top: 16, bottom: 24 })
+    .backgroundColor($r('sys.color.background_secondary'))
+  }
+
+  @Builder
+  private profileSheetGroup(items: ProfileSheetItem[]) {
+    Column({ space: 0 }) {
+      ForEach(items, (item: ProfileSheetItem, index: number) => {
+        this.profileSheetRow(item, index !== items.length - 1)
+      }, (item: ProfileSheetItem, index: number) => index.toString())
+    }
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .borderRadius(16)
+    .clip(true)
+    .width('100%')
+  }
+
+  @Builder
+  private profileSheetRow(item: ProfileSheetItem, showDivider: boolean) {
+    Row({ space: 12 }) {
+      Text(item.label)
+        .fontSize(16)
+        .fontColor($r('sys.color.font_primary'))
+        .layoutWeight(1)
+
+      if (item.isAvatar) {
+        Stack({ alignContent: Alignment.Center }) {
+          Row()
+            .width(56)
+            .height(56)
+            .backgroundColor($r('sys.color.comp_background_secondary'))
+            .borderRadius(28)
+          Text('LT')
+            .fontSize(20)
+            .fontWeight(FontWeight.Medium)
+            .fontColor($r('sys.color.font_primary'))
+        }
+      } else {
+        Row({ space: 8 }) {
+          Text(item.value)
+            .fontSize(16)
+            .fontColor($r('sys.color.font_secondary'))
+
+          if (item.tag) {
+            Text(item.tag)
+              .fontSize(12)
+              .fontColor('#1D63ED')
+              .padding({ left: 6, right: 6, top: 2, bottom: 2 })
+              .backgroundColor('#E6EEFF')
+              .borderRadius(6)
+          }
+        }
+        .alignItems(VerticalAlign.Center)
+      }
+
+      SymbolGlyph($r('sys.symbol.chevron_right'))
+        .fontSize(16)
+        .fontColor([$r('sys.color.font_tertiary')])
+    }
+    .width('100%')
+    .height(item.isAvatar ? 76 : 56)
+    .padding({ left: 16, right: 16 })
+    .backgroundColor($r('sys.color.comp_background_primary'))
+    .border({
+      width: {
+        bottom: showDivider ? 0.5 : 0
+      },
       color: $r('sys.color.comp_divider')
     })
   }
